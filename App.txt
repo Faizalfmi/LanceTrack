@@ -5,9 +5,7 @@ import { createNativeStackNavigator } from '@react-navigation/native-stack';
 
 
 import HomeUser from './src/Screens/HomeUser';
-import HomeDriver from './src/Screens/HomeDriver';
 import Profile from './src/Screens/Profile';
-import UpdateProfile from './src/Screens/UpdateProfile';
 import LoginUser from './src/Screens/LoginUser';
 import LoginDriver from './src/Screens/LoginDriver';
 import Register from './src/Screens/Register';
@@ -23,9 +21,7 @@ const App = () => {
     <NavigationContainer>
       <Stack.Navigator initialRouteName="Home">
         <Stack.Screen name="Home" component={HomeUser} options={{ headerShown: false }} />
-        <Stack.Screen name="HomeDriver" component={HomeDriver} options={{ headerShown: false }} />
         <Stack.Screen name="Profile" component={Profile} options={{ headerShown: false }} />
-        <Stack.Screen name="UpdateProfile" component={UpdateProfile} options={{ headerShown: false }} />
         <Stack.Screen name="LoginUser" component={LoginUser} options={{ headerShown: false }} />
         <Stack.Screen name="LoginDriver" component={LoginDriver} options={{ headerShown: false }} />
         <Stack.Screen name="Register" component={Register} options={{ headerShown: false }} />
