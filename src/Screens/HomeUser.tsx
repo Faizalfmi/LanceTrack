@@ -1,9 +1,10 @@
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { useFocusEffect } from '@react-navigation/native';
 import { Button, Overlay, Tab, TabView } from '@rneui/themed';
+import axios from 'axios';
 import { Component, useCallback, useEffect } from 'react';
 import React, { useState } from 'react';
-import { View, Text, StyleSheet, TouchableOpacity, Image, ScrollView, TextInput } from 'react-native';
+import { View, Text, StyleSheet, TouchableOpacity, Image, ScrollView, TextInput, Alert } from 'react-native';
 import Swiper from 'react-native-swiper';
 
 type OverlayComponentProps = {};
@@ -13,6 +14,10 @@ const HomeUser: React.FunctionComponent<OverlayComponentProps> = ({navigation, r
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [userName, setUserName] = useState('');
   const [userData, setUserData] = useState(null);
+  const [id, setId] = useState(null);
+  const [orderDetails, setOrderDetails] = useState(null);
+  const [orderDetails2, setOrderDetails2] = useState(null);
+  const [orderCode, setOrderCode] = useState('');
 
   const checkLoginStatus = async () => {
     try {
@@ -20,12 +25,12 @@ const HomeUser: React.FunctionComponent<OverlayComponentProps> = ({navigation, r
       const storedUserName = await AsyncStorage.getItem('userName');
       const storedUserData = await AsyncStorage.getItem('userData');
 
-      console.log('Stored User Data:', storedUserData);
-
-      if (userToken && storedUserName) {
+      if (userToken && storedUserName && storedUserData) {
         setIsLoggedIn(true);
         setUserName(storedUserName);
-        setUserData(JSON.parse(storedUserData));
+        const parsedUserData = JSON.parse(storedUserData);
+        setUserData(parsedUserData);
+        setId(parsedUserData.id);
       } else {
         setIsLoggedIn(false);
         setUserData(null);
@@ -39,11 +44,92 @@ const HomeUser: React.FunctionComponent<OverlayComponentProps> = ({navigation, r
     checkLoginStatus();
   }, []);
 
+  const fetchOrderDetails = async () => {
+    if (!id) {
+      console.error('User ID is not set');
+      return;
+    }
+
+    try {
+      const response = await axios.post('http://10.0.2.2/ambulance/getOrder.php', {
+        id
+      });
+      console.log('Data yang dikirim:', { id,});
+
+      console.log('Response:', response.data);
+
+      if (response.data.success) {
+        setOrderDetails(response.data.order);
+        setId(response.data.order.id)
+      } else {
+        console.log('Error', response.data.message);
+        
+      }
+    } catch (error) {
+      console.error('Error fetching order details:', error);
+      Alert.alert('Error', 'Terjadi kesalahan. Coba lagi nanti.');
+    }
+  };
+  useEffect(() => {
+    if (id) {
+      fetchOrderDetails();
+    }
+  }, [id]);
+
+  const checkOrderCode = async () => {
+    if (!orderCode) {
+      console.error('User ID is not set');
+      return;
+    }
+  
+    try {
+      const response = await axios.post('http://10.0.2.2/ambulance/check_order_code.php', {
+        orderCode
+      });
+  
+      console.log('Response:', response.data);
+  
+      if (response.data.success) {
+        setOrderDetails2(response.data.order);
+        Alert.alert('Pesanan tersedia', 'Pesanan dengan kode pemesanan yang anda berikan tersedia');
+        
+        // Navigate to the Track page
+        navigation.navigate('Track', {
+          orderDetails: response.data.order, // Use response.data.order instead of orderDetails2
+          id_ambulans: response.data.order.id_ambulans
+        });
+      } else {
+        console.log('Error', response.data.message);
+        Alert.alert('Pesanan tidak ditemukan', response.data.message);
+      }
+    } catch (error) {
+      console.error('Error fetching order details:', error);
+      Alert.alert('Error', 'Terjadi kesalahan. Coba lagi nanti.');
+    }
+  };
+  
+
+  const checkOrderData = async () => {
+    
+      if (orderDetails) {
+        setId(orderDetails.id)
+      } else {
+        return
+      }
+    
+  };
+
+  useEffect(() => {
+    checkOrderData();
+  }, []);
+
   useFocusEffect(
     useCallback(() => {
       checkLoginStatus();
+      
     }, [])
   );
+
 
 
   // Image Swiper
@@ -78,6 +164,16 @@ const HomeUser: React.FunctionComponent<OverlayComponentProps> = ({navigation, r
 
     //Tab
     const [tabIndex, setTabIndex] = React.useState(0);
+
+    // navigasi ke track + toggle overlay
+    const handleNavigationAndToggle = () => {
+      // Toggle the overlay
+      setVisible2(!visible2);
+  
+      // Navigate to the Track page
+      navigation.navigate('Track', {
+        orderDetails, id_ambulans: orderDetails.id_ambulans
+      })};
   
   return (
     <View style={styles.container}>
@@ -128,8 +224,9 @@ const HomeUser: React.FunctionComponent<OverlayComponentProps> = ({navigation, r
 
         {/* Baris 1 tombol menu */}
         <View style={styles.buttonsContainer}>
+        {isLoggedIn ? (
           <TouchableOpacity
-           onPress={() => navigation.navigate('HomeDriver')}
+           onPress={() => navigation.navigate('Order', { userData })}
            style={styles.buttonTextContainer}>
             <View style={styles.button}>
             <Image source={
@@ -140,6 +237,21 @@ const HomeUser: React.FunctionComponent<OverlayComponentProps> = ({navigation, r
               Pesan
             </Text>
           </TouchableOpacity>
+        ):(
+          <TouchableOpacity 
+            onPress={toggleOverlay1}
+            style={styles.buttonTextContainer}>
+              <View style={styles.button}>
+              <Image source={
+                    require('./resource/img/pesan.png')}
+                    style={styles.buttonIcon}></Image>
+              </View>
+              <Text style={styles.buttonText}>
+                Pesan
+              </Text>
+            </TouchableOpacity>
+          
+        )}
 
           {isLoggedIn ? (
             <TouchableOpacity 
@@ -200,7 +312,7 @@ const HomeUser: React.FunctionComponent<OverlayComponentProps> = ({navigation, r
         <View style={styles.buttonsContainer}>
           {isLoggedIn ? (
             <TouchableOpacity style={styles.buttonTextContainer}
-            onPress={() => navigation.navigate('History')}>
+            onPress={() => navigation.navigate('History', {id: userData.id})}>
               <View style={styles.button}>
               <Image source={
                     require('./resource/img/riwayat.png')}
@@ -282,7 +394,7 @@ const HomeUser: React.FunctionComponent<OverlayComponentProps> = ({navigation, r
         />
       </Overlay>
 
-      <Overlay isVisible={visible2} onBackdropPress={toggleOverlay2} overlayStyle={{width: "90%", height: 500, borderRadius: 20}}>
+      <Overlay isVisible={visible2} onBackdropPress={toggleOverlay2} overlayStyle={{width: "90%", height: 550, borderRadius: 20}}>
           <Tab
             value={tabIndex}
             onChange={(e) => setTabIndex(e)}
@@ -310,20 +422,22 @@ const HomeUser: React.FunctionComponent<OverlayComponentProps> = ({navigation, r
         <TabView value={tabIndex} onChange={setTabIndex} animationType="spring">
           <TabView.Item style={[styles.tabViewItem, { display: tabIndex === 0 ? 'flex' : 'none' }]}>
             <View style={{width: "90%", padding:30}}>
+            {orderDetails ? (
+              <View>
               <Text
               style={styles.title}>Informasi Pemesanan</Text>
               <Text style={styles.desc}>Lokasi Jemput</Text>
-              <Text style={styles.desc}>****</Text>
-              <Text style={styles.desc}>Lokasi Tujuan</Text>
-              <Text style={styles.desc}>****</Text>
+              <Text style={styles.desc2}>{orderDetails.address}</Text>
               <Text style={styles.desc}>Sopir Ambulans</Text>
-              <Text style={styles.desc}>****</Text>
+              <Text style={styles.desc2}>{orderDetails.sopir}</Text>
               <Text style={styles.desc}>Status</Text>
-              <Text style={styles.desc}>****</Text>
+              <Text style={styles.desc2}>{orderDetails.status}</Text>
+              <Text style={styles.desc}>Waktu Pemesanan</Text>
+              <Text style={styles.desc2}>{orderDetails.waktu}</Text>
 
               <View style={{padding:25}}>
                 <Button
-                onPress={() => navigation.navigate('Track')}
+                onPress={handleNavigationAndToggle}
                 title={"Lacak"}
                 buttonStyle={{
                   backgroundColor: "#FF6F6F",
@@ -334,7 +448,10 @@ const HomeUser: React.FunctionComponent<OverlayComponentProps> = ({navigation, r
 
                 </Button>
               </View>
-              
+              </View>
+              ) : (
+                <Text style={styles.title}>Anda belum memesan ambulans</Text>
+              )}
             </View>
             
           </TabView.Item>
@@ -346,20 +463,22 @@ const HomeUser: React.FunctionComponent<OverlayComponentProps> = ({navigation, r
                 borderColor: "grey",
                 borderWidth: 1,
                 borderRadius:10,
-                alignSelf: "center"}}>
-                  
+                alignSelf: "center"}}
+                onChangeText={text => setOrderCode(text)}>
+                
               </TextInput>
 
               <View style={{padding:35}}>
                 <Button
                 title={"Lacak"}
+                onPress={checkOrderCode}
                 buttonStyle={{
                   backgroundColor: "#FF6F6F",
                   width: 100,
                   borderRadius: 20,
                   alignSelf: "center",
                   padding:10}}>
-
+                  
                 </Button>
               </View>
             </View>
@@ -514,7 +633,12 @@ const styles = StyleSheet.create({
   },
 
   desc: {
-    padding:3,
+    paddingVertical:3,
+    fontSize:18,
+    color: "black"
+  },
+  desc2: {
+    paddingBottom:10,
     fontSize:16,
   },
 });

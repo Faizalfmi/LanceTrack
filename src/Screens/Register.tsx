@@ -8,6 +8,7 @@ const RegisterScreen = ({navigation}) => {
   const [email, setEmail] = useState('');
   const [phone, setPhone] = useState('');
   const [password, setPassword] = useState('');
+  const [nik, setNik] = useState('');
 
   const handleRegister = async () => {
     try {
@@ -15,7 +16,8 @@ const RegisterScreen = ({navigation}) => {
         name,
         email,
         phone,
-        password
+        password,
+        nik
       });
       
       if (response.data.success) {
@@ -34,7 +36,7 @@ const RegisterScreen = ({navigation}) => {
     <View style={styles.container}>
       <Text style={styles.header}>Register</Text>
 
-      <Text style={styles.inputText}>Nama Lengkap</Text>
+      <Text style={styles.inputText}>Nama Lengkap (Sesuai KTP)</Text>
       <TextInput
         style={styles.input}
         onChangeText={text => setName(text)}
@@ -51,6 +53,14 @@ const RegisterScreen = ({navigation}) => {
         style={styles.input}
         onChangeText={text => setPhone(text)}
         keyboardType="phone-pad"
+      />
+
+      <Text style={styles.inputText}>NIK</Text>
+      <TextInput
+        style={styles.input}
+        onChangeText={text => setPhone(text)}
+        maxLength={16}
+        
       />
 
       <Text style={styles.inputText}>Password</Text>

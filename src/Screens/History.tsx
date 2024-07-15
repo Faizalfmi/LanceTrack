@@ -1,142 +1,98 @@
-import { IconFill, IconOutline } from "@ant-design/icons-react-native";
+import { IconOutline } from "@ant-design/icons-react-native";
 import { Header } from "@rneui/base";
-import React, { useState } from 'react';
-import { View, Text, TouchableOpacity, Image, StyleSheet, ScrollView, TextInput, Button, ImageBackground } from 'react-native';
+import axios from "axios";
+import React, { useEffect, useState } from 'react';
+import { View, Text, TouchableOpacity, ScrollView, Alert, StyleSheet } from 'react-native';
 
-export default function History({ navigation }) {
-  
+export default function History({ navigation, route }) {
+  const { id } = route.params;
+  const [history, setHistory] = useState([]);
+
+  const fetchHistory = async () => {
+    if (!id) {
+      console.error('User ID is not set');
+      return;
+    }
+
+    try {
+      const response = await axios.post('http://10.0.2.2/ambulance/get_history.php', { id });
+      console.log('Data yang dikirim:', { id });
+      console.log('Response:', response.data);
+
+      if (response.data.success) {
+        if (Array.isArray(response.data.order)) {
+          setHistory(response.data.order);
+        } else {
+          console.error('Response order is not an array');
+        }
+      } else {
+        Alert.alert('Error', response.data.message);
+      }
+    } catch (error) {
+      console.error('Error fetching order details:', error);
+      Alert.alert('Error', 'Terjadi kesalahan. Coba lagi nanti.');
+    }
+  };
+
+  useEffect(() => {
+    fetchHistory();
+  }, [id]);
+
   return (
-      <ScrollView>
-        <Header
-          backgroundColor="#FF6F6F"
-          leftComponent={
-            <TouchableOpacity
-            onPress={() => navigation.goBack()}>
-              <IconOutline name="arrow-left" color="white" size={25}/>
-            </TouchableOpacity>
-          }
-          centerComponent={{ text: 'Riwayat', style: { color: '#fff', fontSize: 22} }}
-          
-        />
-        <View style={styles.container}>
-          <View style={styles.dataContainer}>
-            <View style={styles.data}>
-              <View style={styles.dataText}>
-                <Text style={styles.dataTitle}>
-                  Nama Ambulans
-                </Text>
-                <View style={styles.desc}>
-                  <Text style={styles.dataInside}>
-                    Sopir
-                  </Text>
-                  <Text style={styles.dataInside}>
-                    :
-                  </Text>
-                </View>
-                <View style={styles.desc}>
-                  <Text style={styles.dataInside}>
-                    Tujuan
-                  </Text>
-                  <Text style={styles.dataInside}>
-                    :
-                  </Text>
-                </View>
-                <View style={styles.desc}>
-                  <Text style={styles.dataInside}>
-                    Lokasi jemput
-                  </Text>
-                  <Text style={styles.dataInside}>
-                    :
-                  </Text>
-                </View>
-                <View style={styles.desc}>
-                  <Text style={styles.dataInside}>
-                    Tanggal
-                  </Text>
-                  <Text style={styles.dataInside}>
-                    :
-                  </Text>
-                </View>
-                <View style={styles.desc}>
-                  <Text style={styles.dataInside}>
-                    Jarak
-                  </Text>
-                  <Text style={styles.dataInside}>
-                    :
-                  </Text>
+    <ScrollView>
+      <Header
+        backgroundColor="#FF6F6F"
+        leftComponent={
+          <TouchableOpacity onPress={() => navigation.goBack()}>
+            <IconOutline name="arrow-left" color="white" size={25} />
+          </TouchableOpacity>
+        }
+        centerComponent={{ text: 'Riwayat', style: { color: '#fff', fontSize: 22 } }}
+      />
+      <View style={styles.container}>
+        {Array.isArray(history) && history.length > 0 ? (
+          history.map((riwayat, index) => (
+            <View style={styles.dataContainer} key={index}>
+              <View style={styles.data}>
+                <View style={styles.dataText}>
+                  <Text style={styles.dataTitle}>{riwayat.ambulans}</Text>
+                  <View style={{ paddingBottom: 10 }}>
+                    <View style={{ flexDirection: "row", width: "100%" }}>
+                      <View style={styles.descCol}>
+                        <Text style={styles.desc}>Sopir ambulans</Text>
+                      </View>
+                      <View style={styles.descCol}>
+                        <Text style={styles.desc}>: </Text>
+                        <Text style={styles.desc}>{riwayat.sopir}</Text>
+                      </View>
+                    </View>
+                    <View style={{ flexDirection: "row", width: "100%" }}>
+                      <View style={styles.descCol}>
+                        <Text style={styles.desc}>Waktu pemesanan</Text>
+                      </View>
+                      <View style={styles.descCol}>
+                        <Text style={styles.desc}>: </Text>
+                        <Text style={styles.desc}>{riwayat.waktu}</Text>
+                      </View>
+                    </View>
+                  </View>
                 </View>
               </View>
-            </View>
-
-            <View style={styles.reviewContainer}>
-              <TouchableOpacity style={styles.reviewButton}>
-                <Text style={{color: "white", fontSize: 16}}>
-                  Ulas
-                </Text>
-              </TouchableOpacity>
-            </View>
-          </View>
-          <View style={styles.dataContainer}>
-            <View style={styles.data}>
-              <View style={styles.dataText}>
-                <Text style={styles.dataTitle}>
-                  Nama Ambulans
-                </Text>
-                <View style={styles.desc}>
-                  <Text style={styles.dataInside}>
-                    Sopir
-                  </Text>
-                  <Text style={styles.dataInside}>
-                    :
-                  </Text>
-                </View>
-                <View style={styles.desc}>
-                  <Text style={styles.dataInside}>
-                    Tujuan
-                  </Text>
-                  <Text style={styles.dataInside}>
-                    :
-                  </Text>
-                </View>
-                <View style={styles.desc}>
-                  <Text style={styles.dataInside}>
-                    Lokasi jemput
-                  </Text>
-                  <Text style={styles.dataInside}>
-                    :
-                  </Text>
-                </View>
-                <View style={styles.desc}>
-                  <Text style={styles.dataInside}>
-                    Tanggal
-                  </Text>
-                  <Text style={styles.dataInside}>
-                    :
-                  </Text>
-                </View>
-                <View style={styles.desc}>
-                  <Text style={styles.dataInside}>
-                    Jarak
-                  </Text>
-                  <Text style={styles.dataInside}>
-                    :
-                  </Text>
-                </View>
+              <View style={styles.reviewContainer}>
+                <TouchableOpacity
+                  style={styles.reviewButton}
+                  onPress={() => navigation.navigate('Review', {id, riwayat})}
+                >
+                  <Text style={{ color: "white", fontSize: 16 }}>Ulas</Text>
+                </TouchableOpacity>
               </View>
             </View>
-
-            <View style={styles.reviewContainer}>
-              <TouchableOpacity style={styles.reviewButton}>
-                <Text style={{color: "white", fontSize: 16}}>
-                  Ulas
-                </Text>
-              </TouchableOpacity>
-            </View>
-          </View>
-        </View>
-      </ScrollView>
-    
-    
+          ))
+        ) : (
+          <Text>Tidak ada riwayat yang ditemukan.</Text>
+        )}
+      </View>
+    </ScrollView>
   );
 }
 
@@ -145,11 +101,9 @@ const styles = StyleSheet.create({
     flex: 1,
     justifyContent: 'flex-start',
     alignItems: 'center',
-    margin:10,
+    margin: 10,
     backgroundColor: 'white'
   },
-
-
   dataContainer: {
     width: "100%",
     padding: 20,
@@ -159,46 +113,35 @@ const styles = StyleSheet.create({
     borderBottomWidth: 1,
     borderBottomColor: "#BABCCA",
   },
-
   data: {
-    padding:10,
+    padding: 10,
     paddingTop: 30,
     flexDirection: "row",
     width: "100%",
-    
   },
-
   dataText: {
-    paddingLeft:20,
     width: "100%"
   },
-
-  desc: {
-    flexDirection: "row",
-    width: "100%",
-    
-  },
-
   dataTitle: {
-    fontSize: 22,
+    fontSize: 24,
     color: "#000",
-    paddingBottom:10
+    paddingBottom: 10,
+    paddingHorizontal: 10,
   },
-
-  dataInside: {
-    fontSize: 16,
+  descCol: {
+    flexDirection: "row",
     width: "50%",
-    color: "#555555"
+    padding: 3
   },
-
+  desc: {
+    fontSize: 16
+  },
   reviewContainer: {
     justifyContent: "flex-end",
     alignContent: "flex-end",
     alignItems: "flex-end",
     width: "100%",
-    
   },
-
   reviewButton: {
     backgroundColor: "#FF6F6F",
     width: 110,
@@ -206,8 +149,5 @@ const styles = StyleSheet.create({
     alignItems: "center",
     justifyContent: "center",
     borderRadius: 20
-  },
-  
+  }
 });
-
-

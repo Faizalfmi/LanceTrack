@@ -20,12 +20,14 @@ const LoginScreen = ({ navigation }) => {
       if (response.data.success) {
         const userToken = response.data.token; // Pastikan token diterima dari backend
         const userName = response.data.user.name; // Pastikan nama diterima dari backend
+        const userId = response.data.user.id; // Pastikan nama diterima dari backend
         const userData = response.data.user; 
         
         if (userToken && userName && userData) {
           // Simpan token dan nama pengguna ke AsyncStorage
           await AsyncStorage.setItem('userToken', userToken);
           await AsyncStorage.setItem('userName', userName);
+          await AsyncStorage.setItem('userId', userId);
           await AsyncStorage.setItem('userData', JSON.stringify(userData));
           
           Alert.alert('Login Berhasil', `Selamat datang, ${userName}`);
@@ -70,9 +72,18 @@ const LoginScreen = ({ navigation }) => {
       <View style={{flexDirection: "row"}}>
         <Text style={{color: "black", fontSize: 16}}>Belum punya akun? </Text><TouchableOpacity onPress={() => navigation.navigate('Register')}><Text style={{color: "#FF6F6F", fontSize: 16, fontWeight: "bold"}}>Daftar</Text></TouchableOpacity>
       </View>
+      
+      <View style={{flexDirection: "row", padding: 10}}>
+        <Text style={{color: "black", fontSize: 16}}>Lupa password? </Text><TouchableOpacity onPress={() => navigation.navigate('Forgot')}><Text style={{color: "#FF6F6F", fontSize: 16, fontWeight: "bold"}}>Reset</Text></TouchableOpacity>
+      </View>
 
       <View style={{flexDirection: "column", width: "100%", alignItems: "center", paddingTop: 20}}>
-        <Text style={{color: "black", fontSize: 16}}>Masuk ke halaman sopir? </Text><TouchableOpacity><Text style={{color: "#FF6F6F", fontSize: 16, fontWeight: "bold"}}>Masuk sebagai sopir</Text></TouchableOpacity>
+        <Text style={{color: "black", fontSize: 16}}>Masuk ke halaman sopir? </Text>
+        <TouchableOpacity onPress={() => navigation.navigate('LoginDriver')}>
+          <Text style={{color: "#FF6F6F", fontSize: 16, fontWeight: "bold"}}>
+            Masuk sebagai sopir
+            </Text>
+        </TouchableOpacity>
       </View>
       
       

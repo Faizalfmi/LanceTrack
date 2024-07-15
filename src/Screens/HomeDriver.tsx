@@ -1,8 +1,8 @@
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { useFocusEffect } from '@react-navigation/native';
 import { Button, Overlay, Tab, TabView } from '@rneui/themed';
-import { Component, useCallback, useEffect } from 'react';
-import React, { useState } from 'react';
+import axios from 'axios';
+import React, { useState, useCallback, useEffect } from 'react';
 import { View, Text, StyleSheet, TouchableOpacity, Image, ScrollView, TextInput, Alert } from 'react-native';
 import Swiper from 'react-native-swiper';
 
@@ -13,6 +13,8 @@ const HomeUser: React.FunctionComponent<OverlayComponentProps> = ({navigation, r
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [userName, setUserName] = useState('');
   const [userData, setUserData] = useState(null);
+  const [id, setId] = useState(null);
+  const [orderDetails, setOrderDetails] = useState(null);
 
   const checkLoginStatus = async () => {
     try {
@@ -20,12 +22,12 @@ const HomeUser: React.FunctionComponent<OverlayComponentProps> = ({navigation, r
       const storedUserName = await AsyncStorage.getItem('userName');
       const storedUserData = await AsyncStorage.getItem('userData');
 
-      console.log('Stored User Data:', storedUserData);
-
-      if (userToken && storedUserName) {
+      if (userToken && storedUserName && storedUserData) {
         setIsLoggedIn(true);
         setUserName(storedUserName);
-        setUserData(JSON.parse(storedUserData));
+        const parsedUserData = JSON.parse(storedUserData);
+        setUserData(parsedUserData);
+        setId(parsedUserData.id);
       } else {
         setIsLoggedIn(false);
         setUserData(null);
@@ -55,7 +57,39 @@ const HomeUser: React.FunctionComponent<OverlayComponentProps> = ({navigation, r
       console.error('Error during logout:', error);
     }
   };
-  
+
+  const fetchOrderDetails = async () => {
+    if (!id) {
+      console.error('User ID is not set');
+      return;
+    }
+
+    try {
+      const response = await axios.post('http://10.0.2.2/ambulance/getOrder2.php', {
+        id
+      });
+      console.log('Data yang dikirim:', { id });
+
+      console.log('Response:', response.data);
+
+      if (response.data.success) {
+        setOrderDetails(response.data.order);
+      } else {
+        setOrderDetails(null);
+        console.log('Error', response.data.message);
+      }
+    } catch (error) {
+      console.error('Error fetching order details:', error);
+      
+    }
+  };
+
+  useEffect(() => {
+    if (id) {
+      fetchOrderDetails();
+    }
+  }, [id]);
+
   return (
     <View style={styles.container}>
 
@@ -63,62 +97,51 @@ const HomeUser: React.FunctionComponent<OverlayComponentProps> = ({navigation, r
         <View style={styles.nameContainer}>
             {isLoggedIn ? (
             <Text style={styles.name}>Hi, {userName}</Text>
-            ):(
+            ) : (
             <Text style={[styles.name, {textDecorationLine: 'underline'}]} onPress={() => navigation.navigate('LoginUser')}> Login </Text>
             )}
             
-            <Image source={
-                require('./resource/img/icons8-notification-100.png')}
-                style={{height:35, width:35}}></Image>
+            <Image source={require('./resource/img/icons8-notification-100.png')} style={{height:35, width:35}}></Image>
         </View>
 
-      
-      
         {/* Swiper gambar ambulans */}
         <View style={styles.orderContainer}>
-            <Text style={styles.title}>
-                Pesanan Aktif
-            </Text>
+            <Text style={styles.title}>Pesanan Aktif</Text>
             <View style={styles.orderShadow}>
-                <View style={styles.order}>
+                {orderDetails ? (
+                  <View style={styles.order}>
                     <View style={{flexDirection: "row", width: "100%", padding:8, paddingTop:15}}>
                         <View style={{width: "50%"}}>
-                            <Text style={styles.desc}>
-                                Kode pemesanan
-                            </Text>
-                            <Text style={styles.desc}>
-                                Nama pemesan
-                            </Text>
-                            <Text style={styles.desc}>
-                                Lokasi
-                            </Text>
-                            <Text style={styles.desc}>
-                                Jarak
-                            </Text>
+                            <Text style={styles.desc}>Kode pemesanan</Text>
+                            <Text style={styles.desc}>Nama pemesan</Text>
+                            <Text style={styles.desc}>Nama ambulans</Text>
+                            <Text style={styles.desc}>Kondisi pasien</Text>
                         </View>
                         <View style={{width: "50%"}}>
-                            <Text style={styles.desc}>
-                                :
-                            </Text>
-                            <Text style={styles.desc}>
-                                :
-                            </Text>
-                            <Text style={styles.desc}>
-                                :
-                            </Text>
-                            <Text style={styles.desc}>
-                                :
-                            </Text>
+                            <Text style={styles.desc}>: {orderDetails.kode}</Text>
+                            <Text style={styles.desc}>: {orderDetails.pemesan}</Text>
+                            <Text style={styles.desc}>: {orderDetails.ambulans}</Text>
+                            <Text style={styles.desc}>: {orderDetails.kondisi}</Text>
                         </View>
-                        
                     </View>
 
                     <View style={{padding:10}}>
-                        <TouchableOpacity style={[styles.tombol, {backgroundColor: "#FF6F6F"}]}>
+                        <TouchableOpacity style={[styles.tombol, {backgroundColor: "#FF6F6F"}]}
+                        onPress={() => navigation.navigate('TrackDriver', {orderDetails})}>
                             <Text style={styles.textTombol}>Lihat Lokasi</Text>
                         </TouchableOpacity>
                     </View>
-                </View>
+                  </View>
+                ) : (
+                  <View style={styles.order}>
+                    <View style={{paddingHorizontal: 20, paddingTop: 25, paddingBottom: 10,}}>
+                      <Text style={{fontSize: 16}}>Belum ada pesanan ...</Text>
+                    </View>
+                    <View style={{alignSelf: "center"}}>
+                      <Image source={require('./resource/img/sleeping.png')} style={{width:130, height:130}}></Image>
+                    </View>
+                  </View>
+                )}
             </View>
         </View>
       
@@ -131,25 +154,17 @@ const HomeUser: React.FunctionComponent<OverlayComponentProps> = ({navigation, r
                 <TouchableOpacity style={styles.buttonTextContainer}
                 onPress={() => navigation.navigate('History')}>
                 <View style={styles.button}>
-                <Image source={
-                        require('./resource/img/riwayat.png')}
-                        style={styles.buttonIcon}></Image>
+                <Image source={require('./resource/img/riwayat.png')} style={styles.buttonIcon}></Image>
                 </View>
-                <Text style={styles.buttonText}>
-                    History
-                </Text>
+                <Text style={styles.buttonText}>History</Text>
                 </TouchableOpacity>
             
                 <TouchableOpacity style={styles.buttonTextContainer}
                 onPress={() => navigation.navigate('Profile', { userData })}>
                 <View style={styles.button}>
-                <Image source={
-                        require('./resource/img/profile.png')}
-                        style={styles.buttonIcon}></Image>
+                <Image source={require('./resource/img/profile.png')} style={styles.buttonIcon}></Image>
                 </View>
-                <Text style={styles.buttonText}>
-                    Profile
-                </Text>
+                <Text style={styles.buttonText}>Profile</Text>
                 </TouchableOpacity>
             
             </View>
@@ -167,7 +182,6 @@ const HomeUser: React.FunctionComponent<OverlayComponentProps> = ({navigation, r
 
 const styles = StyleSheet.create({
   container: {
-    
     height: "100%",
     alignItems: 'center',
     padding: 16,
@@ -183,23 +197,17 @@ const styles = StyleSheet.create({
     padding: 30,
     backgroundColor: '#FF6F6F',
     borderRadius: 20,
-    
   },
-
   name: {
     color: "white",
     fontSize: 20,
     fontWeight: "bold"
-
   },
-
   orderContainer: {
     width:"95%",
     height: 180, 
     borderRadius:20,
-        
   },
-
   orderShadow: {
     alignSelf: "center",
     width: "95%",
@@ -207,7 +215,6 @@ const styles = StyleSheet.create({
     backgroundColor: "#d4d6d4",
     borderRadius: 20,
   },
-
   order: {
     width: "99%",
     borderBottomEndRadius: 20,
@@ -217,7 +224,6 @@ const styles = StyleSheet.create({
     alignSelf: "center",
     verticalAlign: "top"
   },
-
   tombol: {
     alignSelf: "center",
     borderRadius: 50,
@@ -225,17 +231,14 @@ const styles = StyleSheet.create({
     height: 40,
     justifyContent: "center"
   },
-
   textTombol: {
     textAlign: "center",
     color: "white"
   },
-
   buttonsection: {
     paddingTop: 180,
     width: "100%"
   },
-
   buttonsContainer: {
     flexDirection: "row",
     justifyContent: "space-evenly", 
@@ -243,12 +246,9 @@ const styles = StyleSheet.create({
     paddingTop: 30,
     width: "70%"
   },
-
   buttonTextContainer: {
-    
     flexDirection: "column"
   },
-
   button: {
     width: 70,
     height: 70,
@@ -257,19 +257,15 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     borderRadius: 50
   },
-
   buttonText: {
     textAlign: "center",
     padding:8,
     color: "#555555"
   },
-
   buttonIcon: {
     height: 45,
     width:45,
-    
   },
-
   title: {
     color: "#000",
     textAlign: "left",
@@ -278,7 +274,6 @@ const styles = StyleSheet.create({
     padding: 10,
     paddingTop: 90
   },
-
   desc: {
     padding:3,
     fontSize:14,

@@ -3,7 +3,9 @@ import { Header, Rating, Button } from "@rneui/base";
 import React, { useState } from 'react';
 import { View, Text, TouchableOpacity, Image, StyleSheet, ScrollView, TextInput,  ImageBackground } from 'react-native';
 
-export default function DetailAmbulance({ navigation }) {
+export default function DetailAmbulance({ navigation, route }) {
+
+  const {ambulance} = route.params;
   
   return (
       <ScrollView style={{backgroundColor: "white"}}>
@@ -19,8 +21,7 @@ export default function DetailAmbulance({ navigation }) {
           
         />
         <View style={{width: "100%", }}>
-            <Image source={
-                  require('./resource/img/ambulans.jpeg')}
+            <Image source={{ uri: `http://10.0.2.2/ambulance/${ambulance.gambar}` }}
               style={{objectFit: "cover", width: '100%',
                 height: undefined,
                 aspectRatio: 5/3, }}></Image>
@@ -33,15 +34,15 @@ export default function DetailAmbulance({ navigation }) {
             <View style={styles.data}>
               <View style={styles.dataText}>
                 <Text style={styles.dataTitle}>
-                  Nama Ambulans
+                  {ambulance.nama}
                 </Text>
                 <View style={{flexDirection: "row", width: "100%"}}>
                   <View style={{width: "40%"}}>
                     <Text style={styles.dataInside}>
-                      Kondisi
+                      Plat Nomor
                     </Text>
                     <Text style={styles.dataInside}>
-                      Tipe Mobil
+                      Tipe 
                     </Text>
                     <Text style={styles.dataInside}>
                       Terakhir servis
@@ -55,10 +56,10 @@ export default function DetailAmbulance({ navigation }) {
                   </View>
                   <View style={{width: "60%"}}>
                     <Text style={styles.dataInside}>
-                      :
+                      : {ambulance.plat}
                     </Text>
                     <Text style={styles.dataInside}>
-                      :
+                      : {ambulance.tipe}
                     </Text>
                     <Text style={styles.dataInside}>
                       :
@@ -75,12 +76,13 @@ export default function DetailAmbulance({ navigation }) {
               </View>
               <View style={styles.conditionContainer}>
                 <Text style={[styles.dataInside,{paddingBottom: 10}]}>Status</Text>
-                <TouchableOpacity style={styles.conditionButton}>
-                  <Text style={{color: "white", fontSize: 16}}>
-                    Tersedia
+                <TouchableOpacity style={[styles.conditionButton, { backgroundColor: ambulance.status === 'available' ? '#85DD00' : '#E64848' }]}>
+                  <Text style={{ color: "white", fontSize: 16 }}>
+                    {ambulance.status === 'available' ? 'Tersedia' : 'Tidak Tersedia'}
                   </Text>
                 </TouchableOpacity>
               </View>
+              
 
               <View style={{flexDirection: "row", width: "100%", justifyContent: "space-between", paddingTop: 40}}>
                 <Text style={styles.dataInside}>
@@ -99,7 +101,13 @@ export default function DetailAmbulance({ navigation }) {
               </View>
 
               <View style={{paddingVertical: 35}}>
-                <Button title="Pesan" buttonStyle={styles.button} titleStyle={styles.buttonText}/>
+              <Button
+                title="Pesan"
+                buttonStyle={styles.button}
+                titleStyle={styles.buttonText}
+                disabled={ambulance.status !== 'available'} // Nonaktifkan tombol jika status tidak tersedia
+              />
+
               </View>
               
             </View>

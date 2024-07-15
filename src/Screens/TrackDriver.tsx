@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { StyleSheet, View, Text, Clipboard, Alert, TouchableOpacity, ActivityIndicator } from 'react-native';
+import { StyleSheet, View, Text, Clipboard, Alert, TouchableOpacity } from 'react-native';
 import { WebView } from 'react-native-webview';
 import axios from 'axios';
 import { IconOutline } from '@ant-design/icons-react-native';
@@ -8,8 +8,8 @@ import { Header } from '@rneui/base';
 const Track = ({ navigation, route }) => {
   const [location, setLocation] = useState({ lat: null, lng: null });
   const [address, setAddress] = useState('');
-  const { orderDetails, id_ambulans } = route.params;
-  const [ambu, setAmbu] = useState(null);
+  const { orderDetails } = route.params;
+  
 
   const handleMessage = async (event) => {
     const data = JSON.parse(event.nativeEvent.data);
@@ -34,38 +34,9 @@ const Track = ({ navigation, route }) => {
     Alert.alert('Copied to Clipboard', 'The text has been copied to your clipboard.');
   };
 
-  const fetchAmbulance = async () => {
-    if (!id_ambulans) {
-      console.error('Ambulance ID is not set');
-      return;
-    }
+  
 
-    try {
-      const response = await axios.post('http://10.0.2.2/ambulance/getAmbulance.php', {
-        id_ambulans
-      });
-      console.log('Data yang dikirim:', { id_ambulans });
-
-      console.log('Response:', response.data);
-
-      if (response.data.success) {
-        setAmbu(response.data.data); // Update here
-      } else {
-        Alert.alert('Error', response.data.message);
-      }
-    } catch (error) {
-      console.error('Error fetching ambulance details:', error);
-      Alert.alert('Error', 'Terjadi kesalahan. Coba lagi nanti.');
-    }
-  };
-
-  useEffect(() => {
-    if (id_ambulans) {
-      fetchAmbulance();
-    }
-  }, [id_ambulans]);
-
-  const mapHtml = ambu ? `
+  const mapHtml = orderDetails ? `
   <!DOCTYPE html>
   <html>
     <head>
@@ -82,7 +53,7 @@ const Track = ({ navigation, route }) => {
       <div id="map"></div>
       <script>
         function initMap() {
-          var map = L.map('map').setView([${ambu.lat}, ${ambu.lon}], 17); // Gunakan koordinat dari ambu
+          var map = L.map('map').setView([${orderDetails.lat}, ${orderDetails.lon}], 13); // Gunakan koordinat dari orderDetails
           L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
             attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
           }).addTo(map);
@@ -96,8 +67,8 @@ const Track = ({ navigation, route }) => {
           });
 
           // Tambahkan pin dengan ikon kustom
-          var marker = L.marker([${ambu.lat}, ${ambu.lon}], { icon: customIcon }).addTo(map);
-          marker.bindPopup('<b>Lokasi Ambulans</b><br>${ambu.address}').openPopup();
+          var marker = L.marker([${orderDetails.lat}, ${orderDetails.lon}], { icon: customIcon }).addTo(map);
+          marker.bindPopup('<b>Lokasi Pasien</b><br>${orderDetails.address}').openPopup();
         }
       </script>
       <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
@@ -121,7 +92,7 @@ const Track = ({ navigation, route }) => {
         }
         centerComponent={{ text: 'Pelacakan', style: { color: '#fff', fontSize: 22 } }}
       />
-      {ambu ? (
+      {orderDetails ? (
         <WebView
           originWhitelist={['*']}
           source={{ html: mapHtml }}
@@ -129,11 +100,7 @@ const Track = ({ navigation, route }) => {
           onMessage={handleMessage}
         />
       ) : (
-        <View style={{ width: "100%", height:500, justifyContent: "center", alignContent: "center", alignItems: "center"}}>
-          <ActivityIndicator size="large" />
-          <Text>Loading map...</Text>
-        </View>
-        
+        <Text>Loading map...</Text>
       )}
       <View style={styles.inputContainer}>
         <Text style={styles.title}>Informasi Pemesanan</Text>
@@ -147,36 +114,40 @@ const Track = ({ navigation, route }) => {
           <View style={styles.descCol}>
             <Text style={styles.desc}>Lokasi jemput</Text>
           </View>
-          <View style={styles.descCol}>
-            <Text style={styles.desc}>: </Text>
+          <View style={styles.descCol2}>
+            <Text style={styles.desc}>:  </Text>
             <Text style={styles.desc}>{orderDetails.address}</Text>
           </View>
         </View>
         <View style={{ flexDirection: "row", width: "100%" }}>
           <View style={styles.descCol}>
-            <Text style={styles.desc}>Sopir ambulans</Text>
+            <Text style={styles.desc}>Nama pemesan</Text>
           </View>
-          <View style={styles.descCol}>
-            <Text style={styles.desc}>: </Text>
-            <Text style={styles.desc}>{orderDetails.sopir}</Text>
+          <View style={styles.descCol2}>
+            <Text style={styles.desc}>:  </Text>
+            <Text style={styles.desc}>{orderDetails.pemesan}</Text>
           </View>
         </View>
         <View style={{ flexDirection: "row", width: "100%" }}>
           <View style={styles.descCol}>
             <Text style={styles.desc}>Waktu pemesanan</Text>
           </View>
-          <View style={styles.descCol}>
-            <Text style={styles.desc}>: </Text>
+          <View style={styles.descCol2}>
+            <Text style={styles.desc}>:  </Text>
             <Text style={styles.desc}>{orderDetails.waktu}</Text>
           </View>
         </View>
-        <View style={{ padding: 15 }}>
-          <Text style={{ textAlign: "center", fontSize: 16, color: "black", fontWeight: "bold" }}>Status</Text>
-          <Text style={{ textAlign: "center", fontSize: 18, color: "#FF6F6F", fontWeight: "bold" }}>
-            {orderDetails.status}
-          </Text>
-        </View>
+        
       </View>
+      <View style={{ paddingBottom: 10, width: "100%", alignItems: "center"}}>
+          <Text style={{ textAlign: "center", fontSize: 16, color: "black", fontWeight: "bold", padding:5 }}>Status</Text>
+          <TouchableOpacity style={styles.button}>
+            <Text style={{ textAlign: "center", fontSize: 18, color: "white", fontWeight: "bold", padding:5}}>
+                {orderDetails.status}
+            </Text>
+          </TouchableOpacity>
+          
+        </View>
     </View>
   );
 };
@@ -190,7 +161,7 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   inputContainer: {
-    padding: 16,
+    padding: 10,
     backgroundColor: "white",
     width: "95%",
     alignSelf: "center"
@@ -213,12 +184,24 @@ const styles = StyleSheet.create({
     fontSize: 18
   },
   descCol: {
-    flexDirection: "row", width: "50%",
+    flexDirection: "row", width: "40%",
+    padding: 3
+  },
+  descCol2: {
+    flexDirection: "row", width: "60%",
     padding: 3
   },
   desc: {
     fontSize: 16
-  }
+  },
+  button: {
+    width: "auto",
+    backgroundColor: "#FF6F6F",
+    borderRadius:20,
+    paddingHorizontal: 20,
+    height:40,
+    justifyContent: "center"
+  },
 });
 
 export default Track;
