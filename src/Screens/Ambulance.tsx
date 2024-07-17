@@ -121,6 +121,7 @@ const styles = StyleSheet.create({
     alignItems: 'flex-start',
     paddingLeft: 20,
     paddingTop: 30,
+    alignSelf: "flex-start"
     
   },
   conditionButton: {

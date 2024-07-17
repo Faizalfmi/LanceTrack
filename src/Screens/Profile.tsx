@@ -1,7 +1,8 @@
 import { IconFill, IconOutline } from "@ant-design/icons-react-native";
 import AsyncStorage from "@react-native-async-storage/async-storage";
+import { Overlay, Button } from "@rneui/base";
 import React, { useEffect, useState } from 'react';
-import { View, Text, TouchableOpacity, Image, StyleSheet, ScrollView, TextInput, Button, ImageBackground, Alert } from 'react-native';
+import { View, Text, TouchableOpacity, Image, StyleSheet, ScrollView, TextInput, ImageBackground, Alert } from 'react-native';
 
 
 export default function Profile({ navigation, route }) {
@@ -13,11 +14,18 @@ export default function Profile({ navigation, route }) {
       await AsyncStorage.removeItem('userToken');
       await AsyncStorage.removeItem('userData');
       Alert.alert('Logout Berhasil', 'Anda telah keluar.');
+      setVisible1(!visible1);
       navigation.navigate('Home');
     } catch (error) {
       console.error('Error during logout:', error);
     }
   };
+
+  const [visible1, setVisible1] = useState(false);
+    
+    const toggleOverlay1 = () => {
+      setVisible1(!visible1);
+    };
   
   return (
       <View style={styles.container}>
@@ -79,7 +87,7 @@ export default function Profile({ navigation, route }) {
         </View>
 
         <View style={styles.logoutContainer}>
-          <TouchableOpacity style={styles.logoutButton} onPress={handleLogout}>
+          <TouchableOpacity style={styles.logoutButton} onPress={toggleOverlay1}>
             <View style={{flexDirection: "row"}}>
               <Text style={{color: "white", fontSize: 16, paddingHorizontal: 7}}>
                 Logout  
@@ -88,6 +96,27 @@ export default function Profile({ navigation, route }) {
             </View>
           </TouchableOpacity>
         </View>
+
+        {/* Tampilan Overlay */}
+      <Overlay isVisible={visible1} onBackdropPress={toggleOverlay1} overlayStyle={{width: "80%", borderRadius: 15, height:280, justifyContent: 'center', backgroundColor: "white"}}>
+        <Text style={{fontWeight: "bold", fontSize: 24, textAlign: "center"}}>
+          Apakah Anda Yakin?
+        </Text>
+        <Text style={{padding: 30, paddingBottom: 50, fontSize: 16,textAlign: "center"}}>
+          Apakah Anda yakin ingin keluar dari akun dan kembali ke halaman beranda?
+        </Text>
+        <View style={{flexDirection: "row", width: "100%",  justifyContent: "space-evenly"}}>
+          <Button buttonStyle={{width: 100,  borderRadius:10, backgroundColor: "#d3c7c8"}}
+            title="Tidak"
+            onPress={toggleOverlay1}
+          />
+          <Button buttonStyle={{width: 100,  borderRadius:10, backgroundColor: "#FF6F6F"}}
+            title="Logout"
+            onPress={handleLogout}
+          />
+        </View>
+        
+      </Overlay>
 
         
       </View>

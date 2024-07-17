@@ -14,6 +14,7 @@ import LoginDriver from './src/Screens/LoginDriver';
 import Register from './src/Screens/Register';
 import History from './src/Screens/History';
 import Review from './src/Screens/Review';
+import Review_list from './src/Screens/Review_list';
 import Track from './src/Screens/Track';
 import TrackDriver from './src/Screens/TrackDriver';
 import Order from './src/Screens/Order';
@@ -36,6 +37,7 @@ const App = () => {
         <Stack.Screen name="Register" component={Register} options={{ headerShown: false }} />
         <Stack.Screen name="History" component={History} options={{ headerShown: false }} />
         <Stack.Screen name="Review" component={Review} options={{ headerShown: false }} />
+        <Stack.Screen name="Review_list" component={Review_list} options={{ headerShown: false }} />
         <Stack.Screen name="Track" component={Track} options={{ headerShown: false }} />
         <Stack.Screen name="TrackDriver" component={TrackDriver} options={{ headerShown: false }} />
         <Stack.Screen name="Order" component={Order} options={{ headerShown: false }} />

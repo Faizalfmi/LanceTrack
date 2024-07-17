@@ -1,11 +1,43 @@
 import { IconFill, IconOutline } from "@ant-design/icons-react-native";
-import { Header, Rating, Button } from "@rneui/base";
-import React, { useState } from 'react';
-import { View, Text, TouchableOpacity, Image, StyleSheet, ScrollView, TextInput,  ImageBackground } from 'react-native';
+import { Header, Button } from "@rneui/base";
+import { Rating, AirbnbRating } from 'react-native-ratings';
+import axios from "axios";
+import React, { useEffect, useState } from 'react';
+import { View, Text, TouchableOpacity, Image, StyleSheet, ScrollView, TextInput,  ImageBackground, Alert } from 'react-native';
 
 export default function DetailAmbulance({ navigation, route }) {
 
   const {ambulance} = route.params;
+  const {id_ambulans} = ambulance;
+  const [review, setReview] = useState([]);
+  const [rataAmbu, setRataAmbu] = useState(0);
+  const [rataSopir, setRataSopir] = useState(0);
+  const [total, setTotal] = useState(0);
+
+  const fetchAmbulances = async () => {
+    try {
+      const response = await axios.post('http://10.0.2.2/ambulance/get_ambu_rating.php', {
+        id_ambulans
+      });
+
+      console.log('Response:', response.data);
+
+      if (response.data.success) {
+        setReview(response.data.review);
+        setRataAmbu(response.data.rata_ambulans)
+        setRataSopir(response.data.rata_sopir)
+        setTotal(response.data.total)
+      } else {
+        console.log('Error', response.data.message);
+      }
+    } catch (error) {
+      console.error('Error fetching reviews:', error);
+      console.log('Error', 'Terjadi kesalahan. Coba lagi nanti.');
+    }
+  };
+  useEffect(() => {
+    fetchAmbulances();
+  }, []);
   
   return (
       <ScrollView style={{backgroundColor: "white"}}>
@@ -88,16 +120,24 @@ export default function DetailAmbulance({ navigation, route }) {
                 <Text style={styles.dataInside}>
                   Rating
                 </Text>
-                <TouchableOpacity>
+                <TouchableOpacity
+                onPress={() => navigation.navigate('Review_list', { review })}>
                   <Text style={styles.dataInside}>
-                    Lihat Review{'->'}
+                    Lihat Review >
                   </Text>
                 </TouchableOpacity>
               </View>
-              <View style={{justifyContent: "flex-start", paddingVertical: 10, flexDirection: "row"}}>
-                <Text style={styles.dataInside}>4.5</Text>
-                <IconFill name="star" color="#ffd250" size={25}/>
-                <Text style={[styles.dataInside,{paddingHorizontal:10}]}>(50)</Text>
+              <View style={{justifyContent: "flex-start", paddingVertical: 10, flexDirection: "row", alignItems: "center"}}>
+                <Text style={styles.dataInside}>{rataAmbu}</Text>
+                <Rating
+                  type='star'
+                  ratingCount={5}
+                  fractions={1}
+                  imageSize={20}
+                  startingValue={rataAmbu}
+                  readonly
+                  />
+                <Text style={[styles.dataInside,{paddingHorizontal:10}]}>({total})</Text>
               </View>
 
               <View style={{paddingVertical: 35}}>
@@ -109,15 +149,8 @@ export default function DetailAmbulance({ navigation, route }) {
               />
 
               </View>
-              
             </View>
           </View>
-
-
-
-          
-          
-          
         </View>
       </ScrollView>
     
@@ -171,7 +204,7 @@ const styles = StyleSheet.create({
 
   dataInside: {
     fontSize: 18,
-    
+    paddingHorizontal: 5,
     color: "#555555"
   },
 
