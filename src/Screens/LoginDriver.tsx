@@ -23,12 +23,14 @@ const LoginScreen = ({navigation}) => {
         const userToken = response.data.token;
         const userName = response.data.user.nama; // Ganti `name` dengan `nama`
         const userId = response.data.user.id;
+        const userRole = response.data.user.role;
         const userData = response.data.user; 
         
         if (userToken && userName && userData) {
           await AsyncStorage.setItem('userToken', userToken);
           await AsyncStorage.setItem('userName', userName);
           await AsyncStorage.setItem('userId', userId);
+          await AsyncStorage.setItem('userRole', userRole); // Simpan peran pengguna
           await AsyncStorage.setItem('userData', JSON.stringify(userData));
           
           Alert.alert('Login Berhasil', `Selamat datang, ${userName}`);
@@ -72,11 +74,11 @@ const LoginScreen = ({navigation}) => {
 
       <View style={{flexDirection: "column", width: "100%", alignItems: "center",}}>
         <Text style={{color: "black", fontSize: 16}}>
-          Masuk ke halaman pemesan? 
+          Masuk ke halaman pelanggan? 
         </Text>
         <TouchableOpacity onPress={() => navigation.navigate('LoginUser')}>
           <Text style={{color: "#FF6F6F", fontSize: 16, fontWeight: "bold"}}>
-            Masuk sebagai pemesan
+            Masuk sebagai pelanggan
             </Text>
         </TouchableOpacity>
       </View>

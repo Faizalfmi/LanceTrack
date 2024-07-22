@@ -15,7 +15,7 @@ export default function Profile({ navigation, route }) {
       await AsyncStorage.removeItem('userData');
       Alert.alert('Logout Berhasil', 'Anda telah keluar.');
       setVisible1(!visible1);
-      navigation.navigate('Home');
+      navigation.navigate('HomeUser');
     } catch (error) {
       console.error('Error during logout:', error);
     }

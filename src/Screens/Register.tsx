@@ -25,6 +25,7 @@ const RegisterScreen = ({navigation}) => {
         navigation.navigate('LoginUser');
       } else {
         Alert.alert('Registrasi Gagal', response.data.message);
+        console.log('Registrasi Gagal', response.data.message);
       }
     } catch (error) {
       console.error(error);
@@ -58,7 +59,7 @@ const RegisterScreen = ({navigation}) => {
       <Text style={styles.inputText}>NIK</Text>
       <TextInput
         style={styles.input}
-        onChangeText={text => setPhone(text)}
+        onChangeText={text => setNik(text)}
         maxLength={16}
         
       />

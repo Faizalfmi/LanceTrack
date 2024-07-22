@@ -1,8 +1,7 @@
-// App.js
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { NavigationContainer } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
-
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 import HomeUser from './src/Screens/HomeUser';
 import HomeDriver from './src/Screens/HomeDriver';
@@ -24,10 +23,32 @@ import DetailAmbulance from './src/Screens/DetailAmbulance';
 const Stack = createNativeStackNavigator();
 
 const App = () => {
+  const [initialRoute, setInitialRoute] = useState(null);
+
+  useEffect(() => {
+    const determineInitialRoute = async () => {
+      const userToken = await AsyncStorage.getItem('userToken');
+      const userRole = await AsyncStorage.getItem('userRole');
+
+      if (userToken && userRole) {
+        setInitialRoute(userRole === 'driver' ? 'HomeDriver' : 'HomeUser');
+      } else {
+        setInitialRoute('HomeUser'); // Atau halaman login default
+      }
+    };
+
+    determineInitialRoute();
+  }, []);
+
+  if (initialRoute === null) {
+    // Tampilkan layar loading atau apapun sampai peran pengguna didapatkan
+    return null;
+  }
+
   return (
     <NavigationContainer>
-      <Stack.Navigator initialRouteName="Home">
-        <Stack.Screen name="Home" component={HomeUser} options={{ headerShown: false }} />
+      <Stack.Navigator initialRouteName={initialRoute}>
+        <Stack.Screen name="HomeUser" component={HomeUser} options={{ headerShown: false }} />
         <Stack.Screen name="HomeDriver" component={HomeDriver} options={{ headerShown: false }} />
         <Stack.Screen name="Profile" component={Profile} options={{ headerShown: false }} />
         <Stack.Screen name="UpdateProfile" component={UpdateProfile} options={{ headerShown: false }} />
@@ -41,7 +62,7 @@ const App = () => {
         <Stack.Screen name="Track" component={Track} options={{ headerShown: false }} />
         <Stack.Screen name="TrackDriver" component={TrackDriver} options={{ headerShown: false }} />
         <Stack.Screen name="Order" component={Order} options={{ headerShown: false }} />
-        <Stack.Screen name="Ambulan" component={Ambulance} options={{ headerShown: false }} />
+        <Stack.Screen name="Ambulance" component={Ambulance} options={{ headerShown: false }} />
         <Stack.Screen name="Detail" component={DetailAmbulance} options={{ headerShown: false }} />
       </Stack.Navigator>
     </NavigationContainer>

@@ -21,6 +21,7 @@ const LoginScreen = ({ navigation }) => {
         const userToken = response.data.token; // Pastikan token diterima dari backend
         const userName = response.data.user.name; // Pastikan nama diterima dari backend
         const userId = response.data.user.id; // Pastikan nama diterima dari backend
+        const userRole = response.data.user.role;
         const userData = response.data.user; 
         
         if (userToken && userName && userData) {
@@ -28,11 +29,12 @@ const LoginScreen = ({ navigation }) => {
           await AsyncStorage.setItem('userToken', userToken);
           await AsyncStorage.setItem('userName', userName);
           await AsyncStorage.setItem('userId', userId);
+          await AsyncStorage.setItem('userRole', userRole); // Simpan peran pengguna
           await AsyncStorage.setItem('userData', JSON.stringify(userData));
           
           Alert.alert('Login Berhasil', `Selamat datang, ${userName}`);
           
-          navigation.navigate('Home', { user: userData });
+          navigation.navigate('HomeUser', { user: userData });
         } else {
           throw new Error('Data token atau nama pengguna tidak valid');
         }

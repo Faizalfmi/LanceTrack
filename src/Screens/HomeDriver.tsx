@@ -52,7 +52,7 @@ const HomeUser: React.FunctionComponent<OverlayComponentProps> = ({navigation, r
       await AsyncStorage.removeItem('userToken');
       await AsyncStorage.removeItem('userData');
       Alert.alert('Logout Berhasil', 'Anda telah keluar.');
-      navigation.navigate('Home');
+      navigation.navigate('HomeUser');
     } catch (error) {
       console.error('Error during logout:', error);
     }
@@ -127,7 +127,7 @@ const HomeUser: React.FunctionComponent<OverlayComponentProps> = ({navigation, r
 
                     <View style={{padding:10}}>
                         <TouchableOpacity style={[styles.tombol, {backgroundColor: "#FF6F6F"}]}
-                        onPress={() => navigation.navigate('TrackDriver', {orderDetails})}>
+                        onPress={() => navigation.navigate('TrackDriver', {orderDetails, id})}>
                             <Text style={styles.textTombol}>Lihat Lokasi</Text>
                         </TouchableOpacity>
                     </View>
