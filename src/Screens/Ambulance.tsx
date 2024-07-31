@@ -31,7 +31,7 @@ export default function Ambulance({ navigation }) {
   return (
     <ScrollView>
       <Header
-        backgroundColor="#FF6F6F"
+        backgroundColor="#14A44D"
         leftComponent={
           <TouchableOpacity onPress={() => navigation.goBack()}>
             <IconOutline name="arrow-left" color="white" size={25} />

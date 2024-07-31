@@ -1,5 +1,5 @@
-import React, { useState, useEffect } from 'react';
-import { StyleSheet, View, Text, Clipboard, Alert, TouchableOpacity, ActivityIndicator } from 'react-native';
+import React, { useState, useEffect, useCallback } from 'react';
+import { StyleSheet, View, Text, Clipboard, Alert, TouchableOpacity, ActivityIndicator, ScrollView, RefreshControl } from 'react-native';
 import { WebView } from 'react-native-webview';
 import axios from 'axios';
 import { IconOutline } from '@ant-design/icons-react-native';
@@ -8,8 +8,62 @@ import { Header } from '@rneui/base';
 const Track = ({ navigation, route }) => {
   const [location, setLocation] = useState({ lat: null, lng: null });
   const [address, setAddress] = useState('');
-  const { orderDetails, id_ambulans } = route.params;
+  const [orderDetails, setOrderDetails] = useState(null);
+  const { id, id_ambulans } = route.params;
   const [ambu, setAmbu] = useState(null);
+  const [isRefreshing, setIsRefreshing] = useState(false);
+
+  const fetchOrderDetails = async () => {
+    if (!id) {
+      console.error('ID is not set');
+      return;
+    }
+
+    try {
+      const response = await axios.post('http://10.0.2.2/ambulance/getOrder.php', { id });
+      console.log('Response:', response.data);
+
+      if (response.data.success) {
+        setOrderDetails(response.data.order);
+      } else {
+        console.log('Error', response.data.message);
+      }
+    } catch (error) {
+      console.error('Error fetching order details:', error);
+      Alert.alert('Error', 'Terjadi kesalahan. Coba lagi nanti.');
+    }
+  };
+
+  useEffect(() => {
+    if (id) {
+      fetchOrderDetails();
+    }
+  }, [id]);
+
+  // Fungsi untuk melakukan refresh
+  const onRefresh = useCallback(() => {
+    setIsRefreshing(true);
+    // Panggil fungsi untuk mendapatkan data terbaru
+    fetchData().then(() => {
+      setIsRefreshing(false); // Set isRefreshing ke false setelah data diperbarui
+    });
+  }, []);
+
+  const fetchData = () => {
+    return new Promise((resolve, reject) => {
+      fetchAmbulance();
+      fetchOrderDetails();
+      resolve(); // Resolusi Promise setelah semua fungsi selesai dijalankan
+    });
+  };
+
+  useEffect(() => {
+    // Set interval untuk refresh data setiap 10 detik
+    const interval = setInterval(fetchData, 10000); // 10000 ms = 10 detik
+
+    // Bersihkan interval saat komponen unmount
+    return () => clearInterval(interval);
+  }, []);
 
   const handleMessage = async (event) => {
     const data = JSON.parse(event.nativeEvent.data);
@@ -41,15 +95,11 @@ const Track = ({ navigation, route }) => {
     }
 
     try {
-      const response = await axios.post('http://10.0.2.2/ambulance/getAmbulance.php', {
-        id_ambulans
-      });
-      console.log('Data yang dikirim:', { id_ambulans });
-
+      const response = await axios.post('http://10.0.2.2/ambulance/getAmbulance.php', { id_ambulans });
       console.log('Response:', response.data);
 
       if (response.data.success) {
-        setAmbu(response.data.data); // Update here
+        setAmbu(response.data.data);
       } else {
         Alert.alert('Error', response.data.message);
       }
@@ -89,10 +139,10 @@ const Track = ({ navigation, route }) => {
 
           // Definisikan ikon kustom
           var customIcon = L.icon({
-            iconUrl: 'https://img.icons8.com/color/48/ambulance.png', // Ganti dengan URL ikon Anda
-            iconSize: [38, 38], // Ukuran ikon
-            iconAnchor: [19, 38], // Titik jangkar ikon
-            popupAnchor: [0, -38] // Titik jangkar popup
+            iconUrl: 'https://img.icons8.com/color/48/ambulance.png',
+            iconSize: [38, 38],
+            iconAnchor: [19, 38],
+            popupAnchor: [0, -38]
           });
 
           // Tambahkan pin dengan ikon kustom
@@ -109,11 +159,13 @@ const Track = ({ navigation, route }) => {
   </html>
 ` : '';
 
-
   return (
-    <View style={styles.container}>
+    <ScrollView 
+      refreshControl={<RefreshControl refreshing={isRefreshing} onRefresh={onRefresh} />}
+      style={styles.container}
+    >
       <Header
-        backgroundColor="#FF6F6F"
+        backgroundColor="#14A44D"
         leftComponent={
           <TouchableOpacity onPress={() => navigation.goBack()}>
             <IconOutline name="arrow-left" color="white" size={25} />
@@ -133,51 +185,56 @@ const Track = ({ navigation, route }) => {
           <ActivityIndicator size="large" />
           <Text>Loading map...</Text>
         </View>
-        
       )}
       <View style={styles.inputContainer}>
         <Text style={styles.title}>Informasi Pemesanan</Text>
-        <View style={styles.kodeContainer}>
-          <Text style={styles.kode}>{orderDetails.kode}</Text>
-          <TouchableOpacity onPress={copyToClipboard} style={{ paddingHorizontal: 10 }}>
-            <IconOutline name="copy" size={24} color="grey" />
-          </TouchableOpacity>
-        </View>
-        <View style={{ flexDirection: "row", width: "100%" }}>
-          <View style={styles.descCol}>
-            <Text style={styles.desc}>Lokasi jemput</Text>
-          </View>
-          <View style={styles.descCol}>
-            <Text style={styles.desc}>: </Text>
-            <Text style={styles.desc}>{orderDetails.address}</Text>
-          </View>
-        </View>
-        <View style={{ flexDirection: "row", width: "100%" }}>
-          <View style={styles.descCol}>
-            <Text style={styles.desc}>Sopir ambulans</Text>
-          </View>
-          <View style={styles.descCol}>
-            <Text style={styles.desc}>: </Text>
-            <Text style={styles.desc}>{orderDetails.sopir}</Text>
-          </View>
-        </View>
-        <View style={{ flexDirection: "row", width: "100%" }}>
-          <View style={styles.descCol}>
-            <Text style={styles.desc}>Waktu pemesanan</Text>
-          </View>
-          <View style={styles.descCol}>
-            <Text style={styles.desc}>: </Text>
-            <Text style={styles.desc}>{orderDetails.waktu}</Text>
-          </View>
-        </View>
-        <View style={{ padding: 15 }}>
-          <Text style={{ textAlign: "center", fontSize: 16, color: "black", fontWeight: "bold" }}>Status</Text>
-          <Text style={{ textAlign: "center", fontSize: 18, color: "#FF6F6F", fontWeight: "bold" }}>
-            {orderDetails.status}
-          </Text>
-        </View>
+        {orderDetails ? (
+          <>
+            <View style={styles.kodeContainer}>
+              <Text style={styles.kode}>{orderDetails.kode}</Text>
+              <TouchableOpacity onPress={copyToClipboard} style={{ paddingHorizontal: 10 }}>
+                <IconOutline name="copy" size={24} color="grey" />
+              </TouchableOpacity>
+            </View>
+            <View style={{ flexDirection: "row", width: "100%" }}>
+              <View style={styles.descCol}>
+                <Text style={styles.desc}>Lokasi jemput</Text>
+              </View>
+              <View style={styles.descCol}>
+                <Text style={styles.desc}>: </Text>
+                <Text style={styles.desc}>{orderDetails.address}</Text>
+              </View>
+            </View>
+            <View style={{ flexDirection: "row", width: "100%" }}>
+              <View style={styles.descCol}>
+                <Text style={styles.desc}>Sopir ambulans</Text>
+              </View>
+              <View style={styles.descCol}>
+                <Text style={styles.desc}>: </Text>
+                <Text style={styles.desc}>{orderDetails.sopir}</Text>
+              </View>
+            </View>
+            <View style={{ flexDirection: "row", width: "100%" }}>
+              <View style={styles.descCol}>
+                <Text style={styles.desc}>Waktu pemesanan</Text>
+              </View>
+              <View style={styles.descCol}>
+                <Text style={styles.desc}>: </Text>
+                <Text style={styles.desc}>{orderDetails.waktu}</Text>
+              </View>
+            </View>
+            <View style={{ padding: 15 }}>
+              <Text style={{ textAlign: "center", fontSize: 16, color: "black", fontWeight: "bold" }}>Status</Text>
+              <Text style={{ textAlign: "center", fontSize: 18, color: "#14A44D", fontWeight: "bold" }}>
+                {orderDetails.status}
+              </Text>
+            </View>
+          </>
+        ) : (
+          <ActivityIndicator size="large" />
+        )}
       </View>
-    </View>
+    </ScrollView>
   );
 };
 
@@ -188,6 +245,8 @@ const styles = StyleSheet.create({
   },
   webview: {
     flex: 1,
+    width: "100%",
+    height: 440
   },
   inputContainer: {
     padding: 16,

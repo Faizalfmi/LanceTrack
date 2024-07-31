@@ -3,7 +3,7 @@ import { useFocusEffect } from '@react-navigation/native';
 import { Button, Overlay, Tab, TabView } from '@rneui/themed';
 import axios from 'axios';
 import React, { useState, useCallback, useEffect } from 'react';
-import { View, Text, StyleSheet, TouchableOpacity, Image, ScrollView, TextInput, Alert } from 'react-native';
+import { View, Text, StyleSheet, TouchableOpacity, Image, ScrollView, TextInput, Alert, ImageBackground, RefreshControl } from 'react-native';
 import Swiper from 'react-native-swiper';
 
 type OverlayComponentProps = {};
@@ -15,6 +15,34 @@ const HomeUser: React.FunctionComponent<OverlayComponentProps> = ({navigation, r
   const [userData, setUserData] = useState(null);
   const [id, setId] = useState(null);
   const [orderDetails, setOrderDetails] = useState(null);
+  const [notif, setNotif] = useState(null);
+  const [unread, setUnread] = useState(null);
+  const [isRefreshing, setIsRefreshing] = useState(false);
+
+  const onRefresh = useCallback(() => {
+    setIsRefreshing(true);
+    // Panggil fungsi untuk mendapatkan data terbaru
+    fetchData().then(() => {
+      setIsRefreshing(false); // Set isRefreshing ke false setelah data diperbarui
+    });
+  }, []);
+
+  const fetchData = () => {
+    return new Promise((resolve, reject) => {
+      fetchNotif();
+      fetchOrderDetails();
+      checkLoginStatus();
+      resolve(); // Resolusi Promise setelah semua fungsi selesai dijalankan
+    });
+  };
+
+  useEffect(() => {
+    // Set interval untuk refresh data setiap 10 detik
+    const interval = setInterval(fetchData, 10000); // 10000 ms = 10 detik
+
+    // Bersihkan interval saat komponen unmount
+    return () => clearInterval(interval);
+  }, []);
 
   const checkLoginStatus = async () => {
     try {
@@ -46,17 +74,6 @@ const HomeUser: React.FunctionComponent<OverlayComponentProps> = ({navigation, r
       checkLoginStatus();
     }, [])
   );
-
-  const handleLogout = async () => {
-    try {
-      await AsyncStorage.removeItem('userToken');
-      await AsyncStorage.removeItem('userData');
-      Alert.alert('Logout Berhasil', 'Anda telah keluar.');
-      navigation.navigate('HomeUser');
-    } catch (error) {
-      console.error('Error during logout:', error);
-    }
-  };
 
   const fetchOrderDetails = async () => {
     if (!id) {
@@ -90,7 +107,68 @@ const HomeUser: React.FunctionComponent<OverlayComponentProps> = ({navigation, r
     }
   }, [id]);
 
+  const fetchNotif = async () => {
+    if (!id) {
+      return;
+    }
+
+    try {
+      const response = await axios.post('http://10.0.2.2/ambulance/get_notif_driver.php', {
+        id
+      });
+      console.log('Data yang dikirim:', { id,});
+
+      console.log('Response:', response.data);
+
+      if (response.data.success) {
+        setNotif(response.data.notif);
+        setUnread(response.data.unread);
+      } else {
+        console.log('Error', response.data.message);
+        
+      }
+    } catch (error) {
+      console.error('Error fetching order details:', error);
+    }
+  };
+  useEffect(() => {
+    if (id) {
+      fetchNotif();
+    }
+  }, [id]);
+
+  useFocusEffect(
+    useCallback(() => {
+      checkLoginStatus();
+      fetchNotif();
+    }, [])
+  );
+
+  const [visible1, setVisible1] = useState(false);
+    
+    const toggleOverlay1 = () => {
+      setVisible1(!visible1);
+    };
+
+    useFocusEffect(
+      useCallback(() => {
+        checkLoginStatus();
+        if (route.params?.notif) {
+          setNotif(route.params.notif);
+        }
+        if (route.params?.unread) {
+          setUnread(route.params.unread);
+        }
+        if (route.params?.orderDetails) {
+          setOrderDetails(route.params.orderDetails);
+        }
+      }, [route.params])
+    );
+
   return (
+    <ScrollView
+    style={{backgroundColor: "white"}}
+    refreshControl={<RefreshControl refreshing={isRefreshing} onRefresh={onRefresh} />}>
     <View style={styles.container}>
 
         {/* Card welcome dan notification */}
@@ -101,7 +179,27 @@ const HomeUser: React.FunctionComponent<OverlayComponentProps> = ({navigation, r
             <Text style={[styles.name, {textDecorationLine: 'underline'}]} onPress={() => navigation.navigate('LoginUser')}> Login </Text>
             )}
             
-            <Image source={require('./resource/img/icons8-notification-100.png')} style={{height:35, width:35}}></Image>
+            <TouchableOpacity onPress={() => navigation.navigate("NotifDriver", { notif, id, })}>
+              <View style={styles.iconContainer}>
+              {isLoggedIn ? (
+                  <ImageBackground
+                      source={require('./resource/img/notif.png')}
+                      style={{ height: 35, width: 35 }}>
+                        {unread > 0 && (
+                          <View style={styles.badge}>
+                            <Text style={styles.badgeText}>{unread}</Text>
+                          </View>
+                        )}
+                    
+                  </ImageBackground>
+              ):(
+                <ImageBackground
+                      source={require('./resource/img/notif.png')}
+                      style={{ height: 35, width: 35 }}></ImageBackground>
+              )}
+                  
+              </View>
+            </TouchableOpacity>
         </View>
 
         {/* Swiper gambar ambulans */}
@@ -126,7 +224,7 @@ const HomeUser: React.FunctionComponent<OverlayComponentProps> = ({navigation, r
                     </View>
 
                     <View style={{padding:10}}>
-                        <TouchableOpacity style={[styles.tombol, {backgroundColor: "#FF6F6F"}]}
+                        <TouchableOpacity style={[styles.tombol, {backgroundColor: "#14A44D"}]}
                         onPress={() => navigation.navigate('TrackDriver', {orderDetails, id})}>
                             <Text style={styles.textTombol}>Lihat Lokasi</Text>
                         </TouchableOpacity>
@@ -152,7 +250,7 @@ const HomeUser: React.FunctionComponent<OverlayComponentProps> = ({navigation, r
             <View style={styles.buttonsContainer}>
 
                 <TouchableOpacity style={styles.buttonTextContainer}
-                onPress={() => navigation.navigate('History')}>
+                onPress={() => navigation.navigate('HistoryDriver', {id})}>
                 <View style={styles.button}>
                 <Image source={require('./resource/img/riwayat.png')} style={styles.buttonIcon}></Image>
                 </View>
@@ -160,7 +258,7 @@ const HomeUser: React.FunctionComponent<OverlayComponentProps> = ({navigation, r
                 </TouchableOpacity>
             
                 <TouchableOpacity style={styles.buttonTextContainer}
-                onPress={() => navigation.navigate('Profile', { userData })}>
+                onPress={() => navigation.navigate('ProfileDriver', { userData })}>
                 <View style={styles.button}>
                 <Image source={require('./resource/img/profile.png')} style={styles.buttonIcon}></Image>
                 </View>
@@ -171,12 +269,9 @@ const HomeUser: React.FunctionComponent<OverlayComponentProps> = ({navigation, r
 
         </View>
 
-        <View style={{paddingTop:150}}>
-            <TouchableOpacity style={[styles.tombol, {backgroundColor: "#E64848"}]} onPress={handleLogout}>
-                <Text style={styles.textTombol}>Logout</Text>
-            </TouchableOpacity>
-        </View>
+        
     </View>
+    </ScrollView>
   );
 };
 
@@ -195,7 +290,7 @@ const styles = StyleSheet.create({
     alignContent: "space-between",
     justifyContent: "space-between",
     padding: 30,
-    backgroundColor: '#FF6F6F',
+    backgroundColor: '#14A44D',
     borderRadius: 20,
   },
   name: {
@@ -252,7 +347,7 @@ const styles = StyleSheet.create({
   button: {
     width: 70,
     height: 70,
-    backgroundColor: "#FF6F6F",
+    backgroundColor: "#14A44D",
     alignItems: "center",
     justifyContent: "center",
     borderRadius: 50
@@ -278,6 +373,23 @@ const styles = StyleSheet.create({
     padding:3,
     fontSize:14,
   },
+  iconContainer: {
+    flexDirection: 'row'
+},
+badge: {
+    backgroundColor: 'red',
+    borderRadius: 10,
+    width: 20,
+    height: 20,
+    justifyContent: 'center',
+    alignItems: 'center',
+    alignSelf: "flex-end"
+},
+badgeText: {
+    color: 'white',
+    fontSize: 12,
+    fontWeight: 'bold'
+}
 });
 
 export default HomeUser;

@@ -77,7 +77,7 @@ const LoginScreen = ({navigation}) => {
           Masuk ke halaman pelanggan? 
         </Text>
         <TouchableOpacity onPress={() => navigation.navigate('LoginUser')}>
-          <Text style={{color: "#FF6F6F", fontSize: 16, fontWeight: "bold"}}>
+          <Text style={{color: "#14A44D", fontSize: 16, fontWeight: "bold"}}>
             Masuk sebagai pelanggan
             </Text>
         </TouchableOpacity>
@@ -100,7 +100,7 @@ const styles = StyleSheet.create({
     fontSize: 40,
     marginBottom: 20,
     padding: 20,
-    color: '#C21010',
+    color: '#14A44D',
     width: "95%"
     
   },
@@ -131,7 +131,7 @@ const styles = StyleSheet.create({
     height: 50, 
     justifyContent: 'center',
     alignItems: 'center',
-    backgroundColor: '#FF6F6F', 
+    backgroundColor: '#14A44D', 
     borderRadius: 25,
     
   },

@@ -41,7 +41,7 @@ export default function History({ navigation, route }) {
   return (
       <ScrollView style={{backgroundColor: "white"}}>
         <Header
-          backgroundColor="#FF6F6F"
+          backgroundColor="#14A44D"
           leftComponent={
             <TouchableOpacity
             onPress={() => navigation.goBack()}>
@@ -171,7 +171,7 @@ const styles = StyleSheet.create({
     width: "90%",
     height: 48,
     borderRadius: 50,
-    backgroundColor: "#FF6F6F",
+    backgroundColor: "#14A44D",
     alignSelf: "center",
     justifyContent: "center",
     

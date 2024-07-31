@@ -5,7 +5,7 @@ import React, { useEffect, useState } from 'react';
 import { View, Text, TouchableOpacity, Image, StyleSheet, ScrollView, TextInput, ImageBackground, Alert } from 'react-native';
 
 
-export default function Profile({ navigation, route }) {
+export default function ProfileDriver({ navigation, route }) {
 
   const { userData } = route.params;
   
@@ -36,15 +36,12 @@ export default function Profile({ navigation, route }) {
               onPress={() => navigation.goBack()}>
                 <IconOutline name='arrow-left' size={30} color="white"/>
               </TouchableOpacity>
-              <TouchableOpacity style={styles.buttonBackground} 
-              onPress={() => navigation.navigate('UpdateProfile', { userData })}>
-                <IconFill name="edit" size={30} color="white"></IconFill>
-              </TouchableOpacity>
+              
             </View>
 
             <View style={styles.profile}>
               <Image source={require('./resource/img/profile.png')} style={{width:80, height:80}}></Image>
-              <Text style={styles.name}>{userData ? userData.name : '-'}</Text>
+              <Text style={styles.name}>{userData ? userData.nama : '-'}</Text>
             </View>
             
           </ImageBackground>
@@ -73,17 +70,7 @@ export default function Profile({ navigation, route }) {
               </Text>
             </View>
           </View>
-          <View style={styles.data}>
-            <IconFill name="idcard" color="#B9B9B9" size={25}></IconFill>
-            <View style={styles.dataText}>
-              <Text style={styles.dataTitle}>
-                NIK
-              </Text>
-                <Text style={styles.dataInside}>
-                {userData ? userData.NIK : '-'}
-              </Text>             
-            </View>
-          </View>
+          
         </View>
 
         <View style={styles.logoutContainer}>

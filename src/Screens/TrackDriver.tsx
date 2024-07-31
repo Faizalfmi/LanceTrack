@@ -13,6 +13,7 @@ const Track = ({ navigation, route }) => {
   const { id } = route.params;
   const [ orderDetails2, setOrderDetails2 ] = useState(null);
   const { kode } = orderDetails;
+  const { id_pemesan } = orderDetails;
   const [selectedValue, setSelectedValue] = useState(orderDetails.status);
   const [refresh, setRefresh] = useState(false);
 
@@ -87,17 +88,21 @@ const Track = ({ navigation, route }) => {
 
   const handleStatus = async (status) => {
     try {
-      console.log('Data yang dikirim:', { kode, status });
+      console.log('Data yang dikirim:', { kode, status, id_pemesan });
 
       if (kode !== null && status !== null) {
         const response = await axios.post('http://10.0.2.2/ambulance/change_status.php', {
           kode,
-          status
+          status,
+          id_pemesan
         });
 
         if (response.data.success) {
           Alert.alert('Status diubah', response.data.message);
           setRefresh(true); // Trigger a refresh
+          if (selectedValue === "Selesai") {
+            navigation.navigate('HomeDriver', {orderDetails: orderDetails2})
+          }
         } else {
           Alert.alert('Perubahan Gagal', response.data.message);
         }
@@ -155,7 +160,7 @@ const Track = ({ navigation, route }) => {
   return (
     <View style={styles.container}>
       <Header
-        backgroundColor="#FF6F6F"
+        backgroundColor="#14A44D"
         leftComponent={
           <TouchableOpacity onPress={() => navigation.goBack()}>
             <IconOutline name="arrow-left" color="white" size={25} />
@@ -217,13 +222,13 @@ const Track = ({ navigation, route }) => {
             style={{ height: 50, width: 250, color: "white" }}
             onValueChange={(itemValue) => handleValueChange(itemValue)}
           >
-            <Picker.Item label="Diterima" value="diterima"/>
-            <Picker.Item label="Menunggu Ambulans" value="menunggu ambulans berangkat" />
-            <Picker.Item label="Menuju Lokasi Pasien" value="menuju lokasi pasien" />
-            <Picker.Item label="Tiba di Lokasi Pasien" value="tiba di lokasi pasien" />
-            <Picker.Item label="Menuju Rumah Sakit" value="menuju rumah sakit" />
-            <Picker.Item label="Sampai di Rumah Sakit" value="sampai di rumah sakit" />
-            <Picker.Item label="Selesai" value="selesai" />
+            <Picker.Item label="Diterima" value="Diterima"/>
+            <Picker.Item label="Menunggu Ambulans" value="Menunggu Ambulans Berangkat" />
+            <Picker.Item label="Menuju Lokasi Pasien" value="Menuju Lokasi Pasien" />
+            <Picker.Item label="Tiba di Lokasi Pasien" value="Tiba di Lokasi Pasien" />
+            <Picker.Item label="Menuju Rumah Sakit" value="Menuju Rumah Sakit" />
+            <Picker.Item label="Sampai di Rumah Sakit" value="Sampai di Rumah Sakit" />
+            <Picker.Item label="Selesai" value="Selesai" />
           </Picker>
         </TouchableOpacity>
       </View>
@@ -275,7 +280,7 @@ const styles = StyleSheet.create({
   },
   button: {
     width: "auto",
-    backgroundColor: "#FF6F6F",
+    backgroundColor: "#14A44D",
     borderRadius:20,
     paddingHorizontal: 20,
     height:40,

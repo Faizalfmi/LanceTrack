@@ -42,7 +42,7 @@ export default function DetailAmbulance({ navigation, route }) {
   return (
       <ScrollView style={{backgroundColor: "white"}}>
         <Header
-          backgroundColor="#FF6F6F"
+          backgroundColor="#14A44D"
           leftComponent={
             <TouchableOpacity
             onPress={() => navigation.goBack()}>
@@ -140,7 +140,7 @@ export default function DetailAmbulance({ navigation, route }) {
                 <Text style={[styles.dataInside,{paddingHorizontal:10}]}>({total})</Text>
               </View>
 
-              <View style={{paddingVertical: 35}}>
+              {/* <View style={{paddingVertical: 35}}>
               <Button
                 title="Pesan"
                 buttonStyle={styles.button}
@@ -148,7 +148,7 @@ export default function DetailAmbulance({ navigation, route }) {
                 disabled={ambulance.status !== 'available'} // Nonaktifkan tombol jika status tidak tersedia
               />
 
-              </View>
+              </View> */}
             </View>
           </View>
         </View>
@@ -197,7 +197,7 @@ const styles = StyleSheet.create({
 
   dataTitle: {
     fontSize: 24,
-    color: "#FF6F6F",
+    color: "#14A44D",
     paddingBottom:20,
     fontWeight: "bold"
   },
@@ -231,7 +231,7 @@ const styles = StyleSheet.create({
     width: "90%",
     height: 48,
     borderRadius: 50,
-    backgroundColor: "#FF6F6F",
+    backgroundColor: "#14A44D",
     alignSelf: "center",
     justifyContent: "center",
   },

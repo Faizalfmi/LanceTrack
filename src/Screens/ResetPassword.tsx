@@ -5,49 +5,31 @@ import { Header, Button } from '@rneui/base';
 import { IconOutline } from '@ant-design/icons-react-native';
 import DatePicker from 'react-native-date-picker';
 
-export default function ForgotPassword({ navigation }) {
-  const [nik, setNik] = useState('');
-  const [date, setDate] = useState(new Date());
-  const [open, setOpen] = useState(false);
-  const [selectedDateLabel, setSelectedDateLabel] = useState('Masukkan Tanggal Lahir Anda');
-
-  const formatDate = (date) => {
-    let day = date.getDate();
-    let month = date.getMonth() + 1; // Bulan dimulai dari 0
-    let year = date.getFullYear();
-
-    if (day < 10) {
-      day = '0' + day;
-    }
-    if (month < 10) {
-      month = '0' + month;
-    }
-
-    return `${day}/${month}/${year}`;
-  };
-
-  const handleConfirm = (date) => {
-    setOpen(false);
-    setDate(date);
-    setSelectedDateLabel(formatDate(date));
-  };
+export default function ForgotPassword({ navigation, route }) {
+    const [newPassword, setNewPassword] = useState('');
+    const [newPassword2, setNewPassword2] = useState('');
+    const {nik} = route.params;
 
   const handleForgotPassword = async () => {
-    const formattedDate = formatDate(date);
-    try {
-      const response = await axios.post('http://10.0.2.2/ambulance/forgot_password.php', { 
-        nik,
-        birthDate: formattedDate
-      });
-      if (response.data.success) {
-        Alert.alert('Success', 'Verifikasi NIK dan tanggal lahir sukses');
-        navigation.navigate('ResetPassword', { nik });
+    if (newPassword2 === newPassword) {
+        try {
+            const response = await axios.post('http://10.0.2.2/ambulance/reset_password.php', { 
+              nik,
+              newPassword
+            });
+            if (response.data.success) {
+              Alert.alert('Success', 'Password berhasil diubah');
+              navigation.navigate('LoginUser');
+            } else {
+              Alert.alert('Error', response.data.message);
+            }
+          } catch (error) {
+            Alert.alert('Error', 'Something went wrong. Please try again later.');
+          }
       } else {
-        Alert.alert('Error', response.data.message);
+        Alert.alert('Error', "Password tidak cocok");
       }
-    } catch (error) {
-      Alert.alert('Error', 'Something went wrong. Please try again later.');
-    }
+    
   };
 
   return (
@@ -62,30 +44,21 @@ export default function ForgotPassword({ navigation }) {
         centerComponent={{ text: '', style: { color: '#fff', fontSize: 22 } }}
       />
       <View style={styles.container2}>
-        <Text style={styles.title}>Forgot Password</Text>
+        <Text style={styles.title}>Reset Password</Text>
         <TextInput
           style={styles.input}
-          placeholder="Masukkan NIK Anda"
-          value={nik}
-          onChangeText={setNik}
-          keyboardType='numeric'
+          placeholder="Masukkan Password Baru Anda"
+          value={newPassword}
+          onChangeText={setNewPassword}
+          secureTextEntry
         />
-        <View style={{
-          padding: 10,
-          paddingBottom: 40,
-        }}>
-          <Button buttonStyle={styles.button} titleStyle={styles.buttonText2} title={selectedDateLabel} onPress={() => setOpen(true)} />
-          <DatePicker
-            modal
-            open={open}
-            date={date}
-            onConfirm={handleConfirm}
-            mode='date'
-            onCancel={() => {
-              setOpen(false);
-            }}
-          />
-        </View>
+        <TextInput
+          style={styles.input}
+          placeholder="Masukkan Ulang Password Baru Anda"
+          value={newPassword2}
+          onChangeText={setNewPassword2}
+          secureTextEntry
+        />
         <TouchableOpacity style={styles.customButton} onPress={handleForgotPassword}>
           <Text style={styles.buttonText}>Submit</Text>
         </TouchableOpacity>

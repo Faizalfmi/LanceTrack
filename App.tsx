@@ -6,12 +6,17 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import HomeUser from './src/Screens/HomeUser';
 import HomeDriver from './src/Screens/HomeDriver';
 import Profile from './src/Screens/Profile';
+import ProfileDriver from './src/Screens/ProfileDriver';
 import UpdateProfile from './src/Screens/UpdateProfile';
 import LoginUser from './src/Screens/LoginUser';
 import Forgot from './src/Screens/Forgot';
+import ResetPassword from './src/Screens/ResetPassword';
 import LoginDriver from './src/Screens/LoginDriver';
 import Register from './src/Screens/Register';
 import History from './src/Screens/History';
+import HistoryDriver from './src/Screens/HistoryDriver';
+import Notif from './src/Screens/Notif';
+import NotifDriver from './src/Screens/NotifDriver';
 import Review from './src/Screens/Review';
 import Review_list from './src/Screens/Review_list';
 import Track from './src/Screens/Track';
@@ -51,12 +56,17 @@ const App = () => {
         <Stack.Screen name="HomeUser" component={HomeUser} options={{ headerShown: false }} />
         <Stack.Screen name="HomeDriver" component={HomeDriver} options={{ headerShown: false }} />
         <Stack.Screen name="Profile" component={Profile} options={{ headerShown: false }} />
+        <Stack.Screen name="ProfileDriver" component={ProfileDriver} options={{ headerShown: false }} />
         <Stack.Screen name="UpdateProfile" component={UpdateProfile} options={{ headerShown: false }} />
         <Stack.Screen name="LoginUser" component={LoginUser} options={{ headerShown: false }} />
         <Stack.Screen name="Forgot" component={Forgot} options={{ headerShown: false }} />
+        <Stack.Screen name="ResetPassword" component={ResetPassword} options={{ headerShown: false }} />
         <Stack.Screen name="LoginDriver" component={LoginDriver} options={{ headerShown: false }} />
         <Stack.Screen name="Register" component={Register} options={{ headerShown: false }} />
         <Stack.Screen name="History" component={History} options={{ headerShown: false }} />
+        <Stack.Screen name="HistoryDriver" component={HistoryDriver} options={{ headerShown: false }} />
+        <Stack.Screen name="Notif" component={Notif} options={{ headerShown: false }} />
+        <Stack.Screen name="NotifDriver" component={NotifDriver} options={{ headerShown: false }} />
         <Stack.Screen name="Review" component={Review} options={{ headerShown: false }} />
         <Stack.Screen name="Review_list" component={Review_list} options={{ headerShown: false }} />
         <Stack.Screen name="Track" component={Track} options={{ headerShown: false }} />

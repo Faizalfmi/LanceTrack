@@ -81,7 +81,7 @@ const Order = ({ navigation, route }) => {
         <div id="map"></div>
         <script>
           function initMap() {
-            var map = L.map('map').setView([-6.917464, 107.619123], 13); // Bandung, Indonesia
+            var map = L.map('map').setView([-6.955962444125773, 107.61252474267977], 16); // Bandung, Indonesia
             L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
               attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
             }).addTo(map);
@@ -110,7 +110,7 @@ const Order = ({ navigation, route }) => {
   return (
     <View style={styles.container}>
         <Header
-          backgroundColor="#FF6F6F"
+          backgroundColor="#14A44D"
           leftComponent={
             <TouchableOpacity
             onPress={() => navigation.goBack()}>
@@ -195,7 +195,7 @@ const styles = StyleSheet.create({
     paddingVertical:15
   },
   button:{
-    backgroundColor: "#FF6F6F",
+    backgroundColor: "#14A44D",
     width: "90%",
     height: 50,
     alignSelf: "center",

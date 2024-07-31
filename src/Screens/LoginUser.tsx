@@ -34,7 +34,7 @@ const LoginScreen = ({ navigation }) => {
           
           Alert.alert('Login Berhasil', `Selamat datang, ${userName}`);
           
-          navigation.navigate('HomeUser', { user: userData });
+          navigation.navigate('HomeUser', { user: userData, id:userId });
         } else {
           throw new Error('Data token atau nama pengguna tidak valid');
         }
@@ -72,17 +72,17 @@ const LoginScreen = ({ navigation }) => {
       </View>
       
       <View style={{flexDirection: "row"}}>
-        <Text style={{color: "black", fontSize: 16}}>Belum punya akun? </Text><TouchableOpacity onPress={() => navigation.navigate('Register')}><Text style={{color: "#FF6F6F", fontSize: 16, fontWeight: "bold"}}>Daftar</Text></TouchableOpacity>
+        <Text style={{color: "black", fontSize: 16}}>Belum punya akun? </Text><TouchableOpacity onPress={() => navigation.navigate('Register')}><Text style={{color: "#14A44D", fontSize: 16, fontWeight: "bold"}}>Daftar</Text></TouchableOpacity>
       </View>
       
       <View style={{flexDirection: "row", padding: 10}}>
-        <Text style={{color: "black", fontSize: 16}}>Lupa password? </Text><TouchableOpacity onPress={() => navigation.navigate('Forgot')}><Text style={{color: "#FF6F6F", fontSize: 16, fontWeight: "bold"}}>Reset</Text></TouchableOpacity>
+        <Text style={{color: "black", fontSize: 16}}>Lupa password? </Text><TouchableOpacity onPress={() => navigation.navigate('Forgot')}><Text style={{color: "#14A44D", fontSize: 16, fontWeight: "bold"}}>Reset</Text></TouchableOpacity>
       </View>
 
       <View style={{flexDirection: "column", width: "100%", alignItems: "center", paddingTop: 20}}>
         <Text style={{color: "black", fontSize: 16}}>Masuk ke halaman sopir? </Text>
         <TouchableOpacity onPress={() => navigation.navigate('LoginDriver')}>
-          <Text style={{color: "#FF6F6F", fontSize: 16, fontWeight: "bold"}}>
+          <Text style={{color: "#14A44D", fontSize: 16, fontWeight: "bold"}}>
             Masuk sebagai sopir
             </Text>
         </TouchableOpacity>
@@ -105,7 +105,7 @@ const styles = StyleSheet.create({
     fontSize: 40,
     marginBottom: 20,
     padding: 20,
-    color: '#C21010',
+    color: '#14A44D',
     width: "95%"
     
   },
@@ -136,7 +136,7 @@ const styles = StyleSheet.create({
     height: 50, 
     justifyContent: 'center',
     alignItems: 'center',
-    backgroundColor: '#FF6F6F', 
+    backgroundColor: '#14A44D', 
     borderRadius: 25,
     
   },

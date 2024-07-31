@@ -1,10 +1,11 @@
 import { IconOutline } from "@ant-design/icons-react-native";
-import { Header, Button } from "@rneui/base";
+import { Header } from "@rneui/base";
 import axios from "axios";
+import { Rating, AirbnbRating } from 'react-native-ratings';
 import React, { useEffect, useState } from 'react';
 import { View, Text, TouchableOpacity, ScrollView, Alert, StyleSheet } from 'react-native';
 
-export default function History({ navigation, route }) {
+export default function HistoryDriver({ navigation, route }) {
   const { id } = route.params;
   const [history, setHistory] = useState([]);
 
@@ -15,7 +16,7 @@ export default function History({ navigation, route }) {
     }
 
     try {
-      const response = await axios.post('http://10.0.2.2/ambulance/get_history.php', { id });
+      const response = await axios.post('http://10.0.2.2/ambulance/get_history2.php', { id });
       console.log('Data yang dikirim:', { id });
       console.log('Response:', response.data);
 
@@ -55,15 +56,33 @@ export default function History({ navigation, route }) {
             <View style={styles.dataContainer} key={index}>
               <View style={styles.data}>
                 <View style={styles.dataText}>
-                  <Text style={styles.dataTitle}>{riwayat.ambulans}</Text>
+                    <View style={{flexDirection: "row", justifyContent: "space-between", alignItems: "center", paddingBottom:15}}>
+                    <Text style={styles.dataTitle}>{riwayat.pemesan}</Text>
+                    <Rating
+                                type='star'
+                                ratingCount={5}
+                                fractions={1}
+                                imageSize={20}
+                                startingValue={riwayat.rating}
+                                readonly
+                                style={{ paddingVertical: 10 }}
+                                
+                                showReadOnlyText={false}
+                                
+                            />
+                            <Text style={{padding: 5}}>
+                                ({riwayat.rating})
+                            </Text>
+                    </View>
+                  
                   <View style={{ paddingBottom: 10 }}>
                     <View style={{ flexDirection: "row", width: "100%" }}>
                       <View style={styles.descCol}>
-                        <Text style={styles.desc}>Sopir ambulans</Text>
+                        <Text style={styles.desc}>Mobil Ambulans</Text>
                       </View>
                       <View style={styles.descCol}>
                         <Text style={styles.desc}>: </Text>
-                        <Text style={styles.desc}>{riwayat.sopir}</Text>
+                        <Text style={styles.desc}>{riwayat.ambulans}</Text>
                       </View>
                     </View>
                     <View style={{ flexDirection: "row", width: "100%" }}>
@@ -75,19 +94,19 @@ export default function History({ navigation, route }) {
                         <Text style={styles.desc}>{riwayat.waktu}</Text>
                       </View>
                     </View>
+                    <View style={{ flexDirection: "row", width: "100%" }}>
+                      <View style={styles.descCol}>
+                        <Text style={styles.desc}>Ulasan</Text>
+                      </View>
+                      <View style={styles.descCol}>
+                        <Text style={styles.desc}>: </Text>
+                        <Text style={styles.desc}>{riwayat.review}</Text>
+                      </View>
+                    </View>
                   </View>
                 </View>
               </View>
-              <View style={styles.reviewContainer}>
-              <Button
-                disabled={riwayat.review_count > 0}
-                buttonStyle={styles.reviewButton}
-                onPress={() => navigation.navigate('Review', { id, riwayat })}
-              >
-                <Text style={{ color: "white", fontSize: 16 }}>Ulas</Text>
-              </Button>
-
-              </View>
+              
             </View>
           ))
         ) : (

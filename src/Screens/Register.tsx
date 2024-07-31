@@ -80,7 +80,7 @@ const RegisterScreen = ({navigation}) => {
       </View>
       
       <View style={{flexDirection: "row"}}>
-        <Text style={{color: "black", fontSize: 16}}>Sudah punya akun? </Text><TouchableOpacity onPress={() => navigation.navigate('LoginUser')}><Text style={{color: "#FF6F6F", fontSize: 14, fontWeight: "bold"}}>Login</Text></TouchableOpacity>
+        <Text style={{color: "black", fontSize: 16}}>Sudah punya akun? </Text><TouchableOpacity onPress={() => navigation.navigate('LoginUser')}><Text style={{color: "#14A44D", fontSize: 14, fontWeight: "bold"}}>Login</Text></TouchableOpacity>
       </View>
       
       
@@ -100,7 +100,7 @@ const styles = StyleSheet.create({
     fontSize: 40,
     marginBottom: 20,
     padding: 20,
-    color: '#C21010',
+    color: '#14A44D',
     width: "95%"
     
   },
@@ -131,7 +131,7 @@ const styles = StyleSheet.create({
     height: 50, 
     justifyContent: 'center',
     alignItems: 'center',
-    backgroundColor: '#FF6F6F', 
+    backgroundColor: '#14A44D', 
     borderRadius: 25,
     
   },

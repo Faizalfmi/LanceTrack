@@ -60,7 +60,7 @@ export default function Review({ navigation, route }) {
   return (
       <ScrollView style={{backgroundColor: "white"}}>
         <Header
-          backgroundColor="#FF6F6F"
+          backgroundColor="#14A44D"
           leftComponent={
             <TouchableOpacity
             onPress={() => navigation.goBack()}>
@@ -88,7 +88,7 @@ export default function Review({ navigation, route }) {
                                 {riwayat.sopir}
                             </Text>
                         </View>
-                        <View style={styles.desc}>
+                        {/* <View style={styles.desc}>
                             <Text style={styles.dataInside}>
                                 Lokasi jemput
                             </Text>
@@ -98,7 +98,7 @@ export default function Review({ navigation, route }) {
                             <Text style={styles.dataInside2}>
                                 {riwayat.address}
                             </Text>
-                        </View>
+                        </View> */}
                         <View style={styles.desc}>
                             <Text style={styles.dataInside}>
                                 Tanggal
@@ -276,7 +276,7 @@ const styles = StyleSheet.create({
   },
 
   reviewButton: {
-    backgroundColor: "#FF6F6F",
+    backgroundColor: "#14A44D",
     width: 280,
     height: 43,
     alignItems: "center",

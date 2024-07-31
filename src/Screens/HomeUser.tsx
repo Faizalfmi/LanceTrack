@@ -4,7 +4,7 @@ import { Button, Overlay, Tab, TabView } from '@rneui/themed';
 import axios from 'axios';
 import { Component, useCallback, useEffect } from 'react';
 import React, { useState } from 'react';
-import { View, Text, StyleSheet, TouchableOpacity, Image, ScrollView, TextInput, Alert } from 'react-native';
+import { View, Text, StyleSheet, TouchableOpacity, Image, ScrollView, TextInput, Alert, ImageBackground, RefreshControl } from 'react-native';
 import Swiper from 'react-native-swiper';
 
 type OverlayComponentProps = {};
@@ -15,9 +15,39 @@ const HomeUser: React.FunctionComponent<OverlayComponentProps> = ({navigation, r
   const [userName, setUserName] = useState('');
   const [userData, setUserData] = useState(null);
   const [id, setId] = useState(null);
+  const [notif, setNotif] = useState(null);
+  const [unread, setUnread] = useState(null);
   const [orderDetails, setOrderDetails] = useState(null);
   const [orderDetails2, setOrderDetails2] = useState(null);
   const [orderCode, setOrderCode] = useState('');
+  const [isRefreshing, setIsRefreshing] = useState(false);
+
+  const onRefresh = useCallback(() => {
+    setIsRefreshing(true);
+    // Panggil fungsi untuk mendapatkan data terbaru
+    fetchData().then(() => {
+      setIsRefreshing(false); // Set isRefreshing ke false setelah data diperbarui
+    });
+  }, []);
+
+  const fetchData = () => {
+    return new Promise((resolve, reject) => {
+      fetchNotif();
+      fetchOrderDetails();
+      checkLoginStatus();
+      checkOrderData();
+      resolve(); // Resolusi Promise setelah semua fungsi selesai dijalankan
+    });
+  };
+
+  useEffect(() => {
+    // Set interval untuk refresh data setiap 10 detik
+    const interval = setInterval(fetchData, 10000); // 10000 ms = 10 detik
+
+    // Bersihkan interval saat komponen unmount
+    return () => clearInterval(interval);
+  }, []);
+
 
   const checkLoginStatus = async () => {
     try {
@@ -46,7 +76,6 @@ const HomeUser: React.FunctionComponent<OverlayComponentProps> = ({navigation, r
 
   const fetchOrderDetails = async () => {
     if (!id) {
-      console.error('User ID is not set');
       return;
     }
 
@@ -60,10 +89,9 @@ const HomeUser: React.FunctionComponent<OverlayComponentProps> = ({navigation, r
 
       if (response.data.success) {
         setOrderDetails(response.data.order);
-        setId(response.data.order.id)
       } else {
         console.log('Error', response.data.message);
-        
+        setOrderDetails(null);
       }
     } catch (error) {
       console.error('Error fetching order details:', error);
@@ -76,9 +104,39 @@ const HomeUser: React.FunctionComponent<OverlayComponentProps> = ({navigation, r
     }
   }, [id]);
 
+  const fetchNotif = async () => {
+    if (!id) {
+      return;
+    }
+
+    try {
+      const response = await axios.post('http://10.0.2.2/ambulance/get_notif.php', {
+        id
+      });
+      console.log('Data yang dikirim:', { id,});
+
+      console.log('Response:', response.data);
+
+      if (response.data.success) {
+        setNotif(response.data.notif);
+        setUnread(response.data.unread);
+      } else {
+        console.log('Error', response.data.message);
+        
+      }
+    } catch (error) {
+      console.error('Error fetching order details:', error);
+    }
+  };
+  useEffect(() => {
+    if (id) {
+      fetchNotif();
+    }
+  }, [id]);
+
   const checkOrderCode = async () => {
     if (!orderCode) {
-      console.error('User ID is not set');
+      console.error('Order Code is not set');
       return;
     }
   
@@ -126,8 +184,13 @@ const HomeUser: React.FunctionComponent<OverlayComponentProps> = ({navigation, r
   useFocusEffect(
     useCallback(() => {
       checkLoginStatus();
-      
-    }, [])
+      if (route.params?.notif) {
+        setNotif(route.params.notif);
+      }
+      if (route.params?.unread) {
+        setUnread(route.params.unread);
+      }
+    }, [route.params])
   );
 
 
@@ -172,29 +235,57 @@ const HomeUser: React.FunctionComponent<OverlayComponentProps> = ({navigation, r
   
       // Navigate to the Track page
       navigation.navigate('Track', {
-        orderDetails, id_ambulans: orderDetails.id_ambulans
+        id, id_ambulans: orderDetails.id_ambulans
       })};
   
   return (
-    <View style={styles.container}>
+    <ScrollView
+    style={{backgroundColor: "white"}}
+    refreshControl={<RefreshControl refreshing={isRefreshing} onRefresh={onRefresh} />} >
+    
+    <View
+    style={styles.container}>
 
       {/* Card welcome dan notification */}
       <View style={styles.nameContainer}>
         {isLoggedIn ? (
           <Text style={styles.name}>Hi, {userName}</Text>
         ):(
-          <Text style={[styles.name, {textDecorationLine: 'underline'}]} onPress={() => navigation.navigate('LoginUser')}> Login </Text>
+          <View style={{flexDirection: "row"}}>
+            <Text style={[styles.name, {textDecorationLine: 'underline'}]} onPress={() => navigation.navigate('Register')}>Daftar</Text>
+            <Text style={[styles.name]}> / </Text>
+            <Text style={[styles.name, {textDecorationLine: 'underline'}]} onPress={() => navigation.navigate('LoginUser')}>Masuk</Text>
+          </View>
+          
         )}
+        <TouchableOpacity onPress={() => navigation.navigate("Notif", { notif, id, })}>
+            <View style={styles.iconContainer}>
+            {isLoggedIn ? (
+                <ImageBackground
+                    source={require('./resource/img/notif.png')}
+                    style={{ height: 35, width: 35 }}>
+                      {unread > 0 && (
+                        <View style={styles.badge}>
+                          <Text style={styles.badgeText}>{unread}</Text>
+                        </View>
+                      )}
+                  
+                </ImageBackground>
+            ):(
+              <ImageBackground
+                    source={require('./resource/img/notif.png')}
+                    style={{ height: 35, width: 35 }}></ImageBackground>
+            )}
+                
+            </View>
+        </TouchableOpacity>
         
-        <Image source={
-            require('./resource/img/icons8-notification-100.png')}
-            style={{height:35, width:35}}></Image>
       </View>
 
       <View style={[styles.logo, {paddingVertical:60}]}>
         <Image source={
-              require('./resource/img/logo.jpeg')}
-              style={styles.logo}></Image>
+                require('./resource/img/logo.jpg')}
+                style={styles.logo}></Image>
       </View>
       
       {/* Swiper gambar ambulans */}
@@ -220,6 +311,7 @@ const HomeUser: React.FunctionComponent<OverlayComponentProps> = ({navigation, r
       </View>
       
       {/* Container tombol menu */}
+      {isLoggedIn ? (
       <View style={styles.buttonsection}>
 
         {/* Baris 1 tombol menu */}
@@ -230,7 +322,7 @@ const HomeUser: React.FunctionComponent<OverlayComponentProps> = ({navigation, r
            style={styles.buttonTextContainer}>
             <View style={styles.button}>
             <Image source={
-                  require('./resource/img/pesan.png')}
+                  require('./resource/img/order.png')}
                   style={styles.buttonIcon}></Image>
             </View>
             <Text style={styles.buttonText}>
@@ -243,7 +335,7 @@ const HomeUser: React.FunctionComponent<OverlayComponentProps> = ({navigation, r
             style={styles.buttonTextContainer}>
               <View style={styles.button}>
               <Image source={
-                    require('./resource/img/pesan.png')}
+                    require('./resource/img/order.png')}
                     style={styles.buttonIcon}></Image>
               </View>
               <Text style={styles.buttonText}>
@@ -259,11 +351,11 @@ const HomeUser: React.FunctionComponent<OverlayComponentProps> = ({navigation, r
             style={styles.buttonTextContainer}>
               <View style={styles.button}>
               <Image source={
-                    require('./resource/img/track.png')}
+                    require('./resource/img/track2.png')}
                     style={styles.buttonIcon}></Image>
               </View>
               <Text style={styles.buttonText}>
-                Track
+                Lacak
               </Text>
             </TouchableOpacity>
           ):(
@@ -272,21 +364,21 @@ const HomeUser: React.FunctionComponent<OverlayComponentProps> = ({navigation, r
           style={styles.buttonTextContainer}>
             <View style={styles.button}>
             <Image source={
-                  require('./resource/img/track.png')}
+                  require('./resource/img/track2.png')}
                   style={styles.buttonIcon}></Image>
             </View>
             <Text style={styles.buttonText}>
-              Track
+              Lacak
             </Text>
           </TouchableOpacity>
           )}
           
           {isLoggedIn ? (
           <TouchableOpacity style={styles.buttonTextContainer}
-          onPress={() => navigation.navigate('Ambulan')}>
+          onPress={() => navigation.navigate('Ambulance')}>
             <View style={styles.button}>
             <Image source={
-                  require('./resource/img/ambuicon.png')}
+                  require('./resource/img/ambu.png')}
                   style={styles.buttonIcon}></Image>
             </View>
             <Text style={styles.buttonText}>
@@ -298,7 +390,7 @@ const HomeUser: React.FunctionComponent<OverlayComponentProps> = ({navigation, r
             onPress={toggleOverlay1}>
             <View style={styles.button}>
             <Image source={
-                  require('./resource/img/ambuicon.png')}
+                  require('./resource/img/ambu.png')}
                   style={styles.buttonIcon}></Image>
             </View>
             <Text style={styles.buttonText}>
@@ -319,7 +411,7 @@ const HomeUser: React.FunctionComponent<OverlayComponentProps> = ({navigation, r
                     style={styles.buttonIcon}></Image>
               </View>
               <Text style={styles.buttonText}>
-                History
+                Riwayat
               </Text>
             </TouchableOpacity>
           ):(
@@ -331,7 +423,7 @@ const HomeUser: React.FunctionComponent<OverlayComponentProps> = ({navigation, r
                   style={styles.buttonIcon}></Image>
             </View>
             <Text style={styles.buttonText}>
-              History
+              Riwayat
             </Text>
           </TouchableOpacity>
           )}
@@ -345,7 +437,7 @@ const HomeUser: React.FunctionComponent<OverlayComponentProps> = ({navigation, r
                     style={styles.buttonIcon}></Image>
               </View>
               <Text style={styles.buttonText}>
-                Profile
+                Profil
               </Text>
             </TouchableOpacity>
           ):(
@@ -357,7 +449,7 @@ const HomeUser: React.FunctionComponent<OverlayComponentProps> = ({navigation, r
                   style={styles.buttonIcon}></Image>
             </View>
             <Text style={styles.buttonText}>
-              Profile
+              Profil
             </Text>
           </TouchableOpacity>
           )}
@@ -378,7 +470,27 @@ const HomeUser: React.FunctionComponent<OverlayComponentProps> = ({navigation, r
         </View>
 
       </View>
-
+      ):(
+        <View style={styles.welcome}>
+            <Text  style={styles.welcomeText}>
+              Selamat datang di LanceTrack Mobile, 
+              solusi terpercaya Anda untuk layanan ambulans cepat dan aman. 
+              Kami memahami betapa berharganya setiap detik dalam situasi darurat, 
+              itulah mengapa kami hadir untuk memastikan Anda mendapatkan bantuan 
+              medis dengan segera. 
+            </Text>
+            <Text  style={styles.welcomeText}>
+              Dengan mengandalkan teknologi terkini dan 
+              jaringan rumah sakit terkemuka, LanceTrack Mobile menawarkan pemesanan 
+              ambulans yang mudah dan efisien. Cukup dengan beberapa klik, 
+              Anda dapat memanggil ambulans kapan saja dan di mana saja. 
+            </Text>
+            <Text  style={styles.welcomeText}>
+              Daftar dan masuk ke akun anda untuk dapat menikmati layanan kami.
+            </Text>
+        </View>
+        
+      )}
 
       {/* Tampilan Overlay */}
       <Overlay isVisible={visible1} onBackdropPress={toggleOverlay1} overlayStyle={{width: "80%", borderRadius: 15, height:250, justifyContent: 'center'}}>
@@ -388,7 +500,7 @@ const HomeUser: React.FunctionComponent<OverlayComponentProps> = ({navigation, r
         <Text style={{padding: 30, paddingBottom: 50, fontSize: 16,textAlign: "center"}}>
           Login ke akun anda terlebih dahulu untuk menggunakan fitur ini
         </Text>
-        <Button buttonStyle={{width: 100, alignSelf: "center", borderRadius:10, backgroundColor: "#FF6F6F"}}
+        <Button buttonStyle={{width: 100, alignSelf: "center", borderRadius:10, backgroundColor: "#14A44D"}}
           title="Login"
           onPress={() => navigation.navigate('LoginUser')}
         />
@@ -399,7 +511,7 @@ const HomeUser: React.FunctionComponent<OverlayComponentProps> = ({navigation, r
             value={tabIndex}
             onChange={(e) => setTabIndex(e)}
             indicatorStyle={{
-              backgroundColor: '#FF6F6F',
+              backgroundColor: '#14A44D',
               height: 4,
               
             }}
@@ -440,7 +552,7 @@ const HomeUser: React.FunctionComponent<OverlayComponentProps> = ({navigation, r
                 onPress={handleNavigationAndToggle}
                 title={"Lacak"}
                 buttonStyle={{
-                  backgroundColor: "#FF6F6F",
+                  backgroundColor: "#14A44D",
                   width: 100,
                   borderRadius: 20,
                   alignSelf: "center",
@@ -473,7 +585,7 @@ const HomeUser: React.FunctionComponent<OverlayComponentProps> = ({navigation, r
                 title={"Lacak"}
                 onPress={checkOrderCode}
                 buttonStyle={{
-                  backgroundColor: "#FF6F6F",
+                  backgroundColor: "#14A44D",
                   width: 100,
                   borderRadius: 20,
                   alignSelf: "center",
@@ -489,6 +601,7 @@ const HomeUser: React.FunctionComponent<OverlayComponentProps> = ({navigation, r
         
       </Overlay>
     </View>
+    </ScrollView>
   );
 };
 
@@ -508,7 +621,7 @@ const styles = StyleSheet.create({
     alignContent: "space-between",
     justifyContent: "space-between",
     padding: 30,
-    backgroundColor: '#FF6F6F',
+    backgroundColor: '#14A44D',
     borderRadius: 20
     
   },
@@ -596,7 +709,7 @@ const styles = StyleSheet.create({
   button: {
     width: 70,
     height: 70,
-    backgroundColor: "#FF6F6F",
+    backgroundColor: "#14A44D",
     alignItems: "center",
     justifyContent: "center",
     borderRadius: 50
@@ -641,6 +754,38 @@ const styles = StyleSheet.create({
     paddingBottom:10,
     fontSize:16,
   },
+
+  iconContainer: {
+    flexDirection: 'row'
+},
+badge: {
+    backgroundColor: 'red',
+    borderRadius: 10,
+    width: 20,
+    height: 20,
+    justifyContent: 'center',
+    alignItems: 'center',
+    alignSelf: "flex-end"
+},
+badgeText: {
+    color: 'white',
+    fontSize: 12,
+    fontWeight: 'bold'
+},
+
+welcome:{
+  padding: 20, 
+  paddingTop: 60,
+},
+
+welcomeText:{
+  textAlign: "justify",
+  fontSize: 16,
+  borderColor: "#14A44D",
+  padding: 5,
+  color: "#6d7f79"
+
+}
 });
 
 export default HomeUser;

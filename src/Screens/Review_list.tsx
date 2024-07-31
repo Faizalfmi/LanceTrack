@@ -11,7 +11,7 @@ export default function Review_list({ navigation, route }) {
   return (
     <ScrollView>
       <Header
-        backgroundColor="#FF6F6F"
+        backgroundColor="#14A44D"
         leftComponent={
           <TouchableOpacity onPress={() => navigation.goBack()}>
             <IconOutline name="arrow-left" color="white" size={25} />
@@ -138,7 +138,7 @@ const styles = StyleSheet.create({
     width: "100%",
   },
   reviewButton: {
-    backgroundColor: "#FF6F6F",
+    backgroundColor: "#14A44D",
     width: 110,
     height: 35,
     alignItems: "center",

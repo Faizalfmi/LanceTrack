@@ -82,7 +82,7 @@ const Track = ({ navigation, route }) => {
       <div id="map"></div>
       <script>
         function initMap() {
-          var map = L.map('map').setView([${ambu.lat}, ${ambu.lon}], 13); // Gunakan koordinat dari ambu
+          var map = L.map('map').setView([${ambu.lat}, ${ambu.lon}], 17); // Gunakan koordinat dari ambu
           L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
             attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
           }).addTo(map);
@@ -113,7 +113,7 @@ const Track = ({ navigation, route }) => {
   return (
     <View style={styles.container}>
       <Header
-        backgroundColor="#FF6F6F"
+        backgroundColor="#14A44D"
         leftComponent={
           <TouchableOpacity onPress={() => navigation.goBack()}>
             <IconOutline name="arrow-left" color="white" size={25} />
@@ -172,7 +172,7 @@ const Track = ({ navigation, route }) => {
         </View>
         <View style={{ padding: 15 }}>
           <Text style={{ textAlign: "center", fontSize: 16, color: "black", fontWeight: "bold" }}>Status</Text>
-          <Text style={{ textAlign: "center", fontSize: 18, color: "#FF6F6F", fontWeight: "bold" }}>
+          <Text style={{ textAlign: "center", fontSize: 18, color: "#14A44D", fontWeight: "bold" }}>
             {orderDetails.status}
           </Text>
         </View>

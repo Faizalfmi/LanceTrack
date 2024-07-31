@@ -1,30 +1,29 @@
 import { IconOutline } from "@ant-design/icons-react-native";
-import { Header, Button } from "@rneui/base";
+import { Header } from "@rneui/base";
 import axios from "axios";
 import React, { useEffect, useState } from 'react';
 import { View, Text, TouchableOpacity, ScrollView, Alert, StyleSheet } from 'react-native';
 
-export default function History({ navigation, route }) {
+export default function NotifDriver({ navigation, route }) {
   const { id } = route.params;
-  const [history, setHistory] = useState([]);
+  const { notif } = route.params;
+  const [newNotif, setNewNotif] = useState(null);
+  const [newUnread, setNewUnread] = useState(null);
 
-  const fetchHistory = async () => {
+  const updateNotif = async () => {
     if (!id) {
       console.error('User ID is not set');
       return;
     }
 
     try {
-      const response = await axios.post('http://10.0.2.2/ambulance/get_history.php', { id });
+      const response = await axios.post('http://10.0.2.2/ambulance/update_notif_driver.php', { id });
       console.log('Data yang dikirim:', { id });
       console.log('Response:', response.data);
 
       if (response.data.success) {
-        if (Array.isArray(response.data.order)) {
-          setHistory(response.data.order);
-        } else {
-          console.error('Response order is not an array');
-        }
+        console.log('Sukses', response.data.message);
+        fetchNotif();
       } else {
         console.log('Error', response.data.message);
       }
@@ -35,63 +34,71 @@ export default function History({ navigation, route }) {
   };
 
   useEffect(() => {
-    fetchHistory();
+    updateNotif();
   }, [id]);
+
+  const fetchNotif = async () => {
+    if (!id) {
+      return;
+    }
+
+    try {
+      const response = await axios.post('http://10.0.2.2/ambulance/get_notif_driver.php', {
+        id
+      });
+      console.log('Data yang dikirim:', { id,});
+
+      console.log('Response:', response.data);
+
+      if (response.data.success) {
+        setNewNotif(response.data.notif);
+        setNewUnread(response.data.unread);
+      } else {
+        console.log('Error', response.data.message);
+        
+      }
+    } catch (error) {
+      console.error('Error fetching order details:', error);
+    }
+  };
+
 
   return (
     <ScrollView>
       <Header
         backgroundColor="#14A44D"
         leftComponent={
-          <TouchableOpacity onPress={() => navigation.goBack()}>
+          <TouchableOpacity onPress={() => navigation.navigate('HomeDriver', {notif: newNotif, unread: newUnread})}>
             <IconOutline name="arrow-left" color="white" size={25} />
           </TouchableOpacity>
         }
-        centerComponent={{ text: 'Riwayat', style: { color: '#fff', fontSize: 22 } }}
+        centerComponent={{ text: 'Notifikasi', style: { color: '#fff', fontSize: 22 } }}
       />
       <View style={styles.container}>
-        {Array.isArray(history) && history.length > 0 ? (
-          history.map((riwayat, index) => (
+        {Array.isArray(notif) && notif.length > 0 ? (
+          notif.map((notifs, index) => (
             <View style={styles.dataContainer} key={index}>
               <View style={styles.data}>
                 <View style={styles.dataText}>
-                  <Text style={styles.dataTitle}>{riwayat.ambulans}</Text>
+                  <Text style={styles.dataTitle}>{notifs.order_status}</Text>
                   <View style={{ paddingBottom: 10 }}>
-                    <View style={{ flexDirection: "row", width: "100%" }}>
+                    <View style={{width: "100%" }}>
                       <View style={styles.descCol}>
-                        <Text style={styles.desc}>Sopir ambulans</Text>
-                      </View>
-                      <View style={styles.descCol}>
-                        <Text style={styles.desc}>: </Text>
-                        <Text style={styles.desc}>{riwayat.sopir}</Text>
+                        <Text style={styles.desc}>{notifs.pesan}</Text>
                       </View>
                     </View>
-                    <View style={{ flexDirection: "row", width: "100%" }}>
+                    <View style={{width: "100%" }}>
                       <View style={styles.descCol}>
-                        <Text style={styles.desc}>Waktu pemesanan</Text>
-                      </View>
-                      <View style={styles.descCol}>
-                        <Text style={styles.desc}>: </Text>
-                        <Text style={styles.desc}>{riwayat.waktu}</Text>
+                        <Text style={[styles.desc, {textAlign: "right", color: "black", paddingTop: 7}]}>{notifs.waktu}</Text>
                       </View>
                     </View>
                   </View>
                 </View>
               </View>
-              <View style={styles.reviewContainer}>
-              <Button
-                disabled={riwayat.review_count > 0}
-                buttonStyle={styles.reviewButton}
-                onPress={() => navigation.navigate('Review', { id, riwayat })}
-              >
-                <Text style={{ color: "white", fontSize: 16 }}>Ulas</Text>
-              </Button>
-
-              </View>
             </View>
           ))
         ) : (
-          <Text>Tidak ada riwayat yang ditemukan.</Text>
+          <Text>Tidak ada notifikasi yang ditemukan.</Text>
         )}
       </View>
     </ScrollView>
@@ -108,7 +115,7 @@ const styles = StyleSheet.create({
   },
   dataContainer: {
     width: "100%",
-    padding: 20,
+    padding: 5,
     alignContent: "flex-start",
     alignItems: "flex-start",
     justifyContent: "flex-start",
@@ -117,7 +124,7 @@ const styles = StyleSheet.create({
   },
   data: {
     padding: 10,
-    paddingTop: 30,
+    paddingTop: 20,
     flexDirection: "row",
     width: "100%",
   },
@@ -125,15 +132,15 @@ const styles = StyleSheet.create({
     width: "100%"
   },
   dataTitle: {
-    fontSize: 24,
-    color: "#000",
+    fontSize: 22,
+    color: "#14A44D",
     paddingBottom: 10,
-    paddingHorizontal: 10,
+    paddingHorizontal: 5,
   },
   descCol: {
-    flexDirection: "row",
-    width: "50%",
-    padding: 3
+    
+    padding: 5,
+    width: "100%"
   },
   desc: {
     fontSize: 16
