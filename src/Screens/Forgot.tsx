@@ -35,7 +35,7 @@ export default function ForgotPassword({ navigation }) {
   const handleForgotPassword = async () => {
     const formattedDate = formatDate(date);
     try {
-      const response = await axios.post('https://91a7-125-164-23-22.ngrok-free.app/api/forgot_password.php', { 
+      const response = await axios.post('http://10.0.2.2/ambulance/forgot_password.php', { 
         nik,
         birthDate: formattedDate
       });

@@ -33,7 +33,7 @@ const Track = ({ navigation, route }) => {
     }
 
     try {
-      const response = await axios.post('https://91a7-125-164-23-22.ngrok-free.app/api/getOrder2.php', {
+      const response = await axios.post('http://10.0.2.2/ambulance/getOrder2.php', {
         id
       });
       console.log('Data yang dikirim:', { id });
@@ -91,7 +91,7 @@ const Track = ({ navigation, route }) => {
       console.log('Data yang dikirim:', { kode, status, id_pemesan });
 
       if (kode !== null && status !== null) {
-        const response = await axios.post('https://91a7-125-164-23-22.ngrok-free.app/api/change_status.php', {
+        const response = await axios.post('http://10.0.2.2/ambulance/change_status.php', {
           kode,
           status,
           id_pemesan

@@ -31,7 +31,7 @@ export default function Review({ navigation, route }) {
   
         // Memastikan data tidak null sebelum mengirimkan permintaan
         if (id) {
-          const response = await axios.post('https://91a7-125-164-23-22.ngrok-free.app/api/post_review.php', {
+          const response = await axios.post('http://10.0.2.2/ambulance/post_review.php', {
             kode, 
             id, 
             id_ambulans, 

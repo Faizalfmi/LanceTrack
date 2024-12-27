@@ -80,7 +80,7 @@ const HomeUser: React.FunctionComponent<OverlayComponentProps> = ({navigation, r
    
 
     try {
-      const response = await axios.post('https://91a7-125-164-23-22.ngrok-free.app/api/getOrder2.php', {
+      const response = await axios.post('http://10.0.2.2/ambulance/getOrder2.php', {
         id
       });
       console.log('Data yang dikirim:', { id });
@@ -111,7 +111,7 @@ const HomeUser: React.FunctionComponent<OverlayComponentProps> = ({navigation, r
     }
 
     try {
-      const response = await axios.post('https://91a7-125-164-23-22.ngrok-free.app/api/get_notif_driver.php', {
+      const response = await axios.post('http://10.0.2.2/ambulance/get_notif_driver.php', {
         id
       });
       console.log('Data yang dikirim:', { id,});

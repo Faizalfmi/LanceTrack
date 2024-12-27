@@ -15,7 +15,7 @@ export default function History({ navigation, route }) {
     }
 
     try {
-      const response = await axios.post('https://91a7-125-164-23-22.ngrok-free.app/api/get_history.php', { id });
+      const response = await axios.post('http://10.0.2.2/ambulance/get_history.php', { id });
       console.log('Data yang dikirim:', { id });
       console.log('Response:', response.data);
 

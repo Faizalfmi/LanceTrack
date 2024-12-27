@@ -13,7 +13,7 @@ export default function Ambulance({ navigation }) {
 
   const fetchAmbulances = async () => {
     try {
-      const response = await axios.get('https://91a7-125-164-23-22.ngrok-free.app/api/get_all_ambulances.php');
+      const response = await axios.get('http://10.0.2.2/ambulance/get_all_ambulances.php');
 
       console.log('Response:', response.data);
 

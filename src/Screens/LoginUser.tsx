@@ -10,7 +10,7 @@ const LoginScreen = ({ navigation }) => {
 
   const handleLogin = async () => {
     try {
-      const response = await axios.post('https://91a7-125-164-23-22.ngrok-free.app/api/login.php', {
+      const response = await axios.post('http://10.0.2.2/ambulance/login.php', {
         email,
         password
       });

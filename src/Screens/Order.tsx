@@ -42,7 +42,7 @@ const Order = ({ navigation, route }) => {
 
       // Memastikan data tidak null sebelum mengirimkan permintaan
       if (id && lat !== null && lng !== null) {
-        const response = await axios.post('https://91a7-125-164-23-22.ngrok-free.app/api/order.php', {
+        const response = await axios.post('http://10.0.2.2/ambulance/order.php', {
           id,
           lat,
           lng,

@@ -12,7 +12,7 @@ const RegisterScreen = ({navigation}) => {
 
   const handleRegister = async () => {
     try {
-      const response = await axios.post('https://91a7-125-164-23-22.ngrok-free.app/api/register.php', {
+      const response = await axios.post('http://10.0.2.2/ambulance/register.php', {
         name,
         email,
         phone,

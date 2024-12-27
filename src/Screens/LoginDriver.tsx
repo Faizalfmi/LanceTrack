@@ -12,7 +12,7 @@ const LoginScreen = ({navigation}) => {
     try {
       console.log('Mengirim data:', { email, password });
       
-      const response = await axios.post('https://91a7-125-164-23-22.ngrok-free.app/api/login_driver.php', {
+      const response = await axios.post('http://10.0.2.2/ambulance/login_driver.php', {
         email,
         password
       });

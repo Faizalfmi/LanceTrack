@@ -16,7 +16,7 @@ export default function DetailAmbulance({ navigation, route }) {
 
   const fetchAmbulances = async () => {
     try {
-      const response = await axios.post('https://91a7-125-164-23-22.ngrok-free.app/api/get_ambu_rating.php', {
+      const response = await axios.post('http://10.0.2.2/ambulance/get_ambu_rating.php', {
         id_ambulans
       });
 
