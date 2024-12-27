@@ -1,14 +1,48 @@
 import { IconFill, IconOutline } from "@ant-design/icons-react-native";
-import { Header, Rating, Button } from "@rneui/base";
-import React, { useState } from 'react';
-import { View, Text, TouchableOpacity, Image, StyleSheet, ScrollView, TextInput,  ImageBackground } from 'react-native';
+import { Header, Button } from "@rneui/base";
+import { Rating, AirbnbRating } from 'react-native-ratings';
+import axios from "axios";
+import React, { useEffect, useState } from 'react';
+import { View, Text, TouchableOpacity, Image, StyleSheet, ScrollView, TextInput,  ImageBackground, Alert } from 'react-native';
 
-export default function DetailAmbulance({ navigation }) {
+export default function DetailAmbulance({ navigation, route }) {
+
+  const {ambulance} = route.params;
+  const {id_ambulans} = ambulance;
+  const [review, setReview] = useState([]);
+  const [rataAmbu, setRataAmbu] = useState(0);
+  const [rataSopir, setRataSopir] = useState(0);
+  const [total, setTotal] = useState(0);
+
+  const fetchAmbulances = async () => {
+    try {
+      const response = await axios.post('https://91a7-125-164-23-22.ngrok-free.app/api/get_ambu_rating.php', {
+        id_ambulans
+      });
+
+      console.log('Response:', response.data);
+
+      if (response.data.success) {
+        setReview(response.data.review);
+        setRataAmbu(response.data.rata_ambulans)
+        setRataSopir(response.data.rata_sopir)
+        setTotal(response.data.total)
+      } else {
+        console.log('Error', response.data.message);
+      }
+    } catch (error) {
+      console.error('Error fetching reviews:', error);
+      console.log('Error', 'Terjadi kesalahan. Coba lagi nanti.');
+    }
+  };
+  useEffect(() => {
+    fetchAmbulances();
+  }, []);
   
   return (
       <ScrollView style={{backgroundColor: "white"}}>
         <Header
-          backgroundColor="#FF6F6F"
+          backgroundColor="#14A44D"
           leftComponent={
             <TouchableOpacity
             onPress={() => navigation.goBack()}>
@@ -19,8 +53,7 @@ export default function DetailAmbulance({ navigation }) {
           
         />
         <View style={{width: "100%", }}>
-            <Image source={
-                  require('./resource/img/ambulans.jpeg')}
+            <Image source={{ uri: `https://91a7-125-164-23-22.ngrok-free.app/frontend/web/upload/${ambulance.gambar}` }}
               style={{objectFit: "cover", width: '100%',
                 height: undefined,
                 aspectRatio: 5/3, }}></Image>
@@ -33,41 +66,23 @@ export default function DetailAmbulance({ navigation }) {
             <View style={styles.data}>
               <View style={styles.dataText}>
                 <Text style={styles.dataTitle}>
-                  Nama Ambulans
+                  {ambulance.nama}
                 </Text>
                 <View style={{flexDirection: "row", width: "100%"}}>
                   <View style={{width: "40%"}}>
                     <Text style={styles.dataInside}>
-                      Kondisi
+                      Plat Nomor
                     </Text>
                     <Text style={styles.dataInside}>
-                      Tipe Mobil
-                    </Text>
-                    <Text style={styles.dataInside}>
-                      Terakhir servis
-                    </Text>
-                    <Text style={styles.dataInside}>
-                      Kondisi
-                    </Text>
-                    <Text style={styles.dataInside}>
-                      Kondisi
+                      Tipe 
                     </Text>
                   </View>
                   <View style={{width: "60%"}}>
                     <Text style={styles.dataInside}>
-                      :
+                      : {ambulance.plat}
                     </Text>
                     <Text style={styles.dataInside}>
-                      :
-                    </Text>
-                    <Text style={styles.dataInside}>
-                      :
-                    </Text>
-                    <Text style={styles.dataInside}>
-                      :
-                    </Text>
-                    <Text style={styles.dataInside}>
-                      :
+                      : {ambulance.tipe}
                     </Text>
                   </View>
                 </View>
@@ -75,41 +90,49 @@ export default function DetailAmbulance({ navigation }) {
               </View>
               <View style={styles.conditionContainer}>
                 <Text style={[styles.dataInside,{paddingBottom: 10}]}>Status</Text>
-                <TouchableOpacity style={styles.conditionButton}>
-                  <Text style={{color: "white", fontSize: 16}}>
-                    Tersedia
+                <TouchableOpacity style={[styles.conditionButton, { backgroundColor: ambulance.status === '0' ? '#85DD00' : '#E64848' }]}>
+                  <Text style={{ color: "white", fontSize: 16 }}>
+                    {ambulance.status === '0' ? 'Tersedia' : 'Tidak Tersedia'}
                   </Text>
                 </TouchableOpacity>
               </View>
+              
 
               <View style={{flexDirection: "row", width: "100%", justifyContent: "space-between", paddingTop: 40}}>
                 <Text style={styles.dataInside}>
                   Rating
                 </Text>
-                <TouchableOpacity>
+                <TouchableOpacity
+                onPress={() => navigation.navigate('Review_list', { review })}>
                   <Text style={styles.dataInside}>
-                    Lihat Review{'->'}
+                    Lihat Review >
                   </Text>
                 </TouchableOpacity>
               </View>
-              <View style={{justifyContent: "flex-start", paddingVertical: 10, flexDirection: "row"}}>
-                <Text style={styles.dataInside}>4.5</Text>
-                <IconFill name="star" color="#ffd250" size={25}/>
-                <Text style={[styles.dataInside,{paddingHorizontal:10}]}>(50)</Text>
+              <View style={{justifyContent: "flex-start", paddingVertical: 10, flexDirection: "row", alignItems: "center"}}>
+                <Text style={styles.dataInside}>{rataAmbu}</Text>
+                <Rating
+                  type='star'
+                  ratingCount={5}
+                  fractions={1}
+                  imageSize={20}
+                  startingValue={rataAmbu}
+                  readonly
+                  />
+                <Text style={[styles.dataInside,{paddingHorizontal:10}]}>({total})</Text>
               </View>
 
-              <View style={{paddingVertical: 35}}>
-                <Button title="Pesan" buttonStyle={styles.button} titleStyle={styles.buttonText}/>
-              </View>
-              
+              {/* <View style={{paddingVertical: 35}}>
+              <Button
+                title="Pesan"
+                buttonStyle={styles.button}
+                titleStyle={styles.buttonText}
+                disabled={ambulance.status !== 'available'} // Nonaktifkan tombol jika status tidak tersedia
+              />
+
+              </View> */}
             </View>
           </View>
-
-
-
-          
-          
-          
         </View>
       </ScrollView>
     
@@ -156,14 +179,14 @@ const styles = StyleSheet.create({
 
   dataTitle: {
     fontSize: 24,
-    color: "#FF6F6F",
+    color: "#14A44D",
     paddingBottom:20,
     fontWeight: "bold"
   },
 
   dataInside: {
     fontSize: 18,
-    
+    paddingHorizontal: 5,
     color: "#555555"
   },
 
@@ -190,7 +213,7 @@ const styles = StyleSheet.create({
     width: "90%",
     height: 48,
     borderRadius: 50,
-    backgroundColor: "#FF6F6F",
+    backgroundColor: "#14A44D",
     alignSelf: "center",
     justifyContent: "center",
   },
