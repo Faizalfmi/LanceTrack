@@ -15,12 +15,12 @@ const Track = ({ navigation, route }) => {
 
   const fetchOrderDetails = async () => {
     if (!id) {
-      console.error('ID is not set');
+      console.log('ID is not set');
       return;
     }
 
     try {
-      const response = await axios.post('http://10.0.2.2/ambulance/getOrder.php', { id });
+      const response = await axios.post('https://91a7-125-164-23-22.ngrok-free.app/api/getOrder.php', { id });
       console.log('Response:', response.data);
 
       if (response.data.success) {
@@ -95,7 +95,7 @@ const Track = ({ navigation, route }) => {
     }
 
     try {
-      const response = await axios.post('http://10.0.2.2/ambulance/getAmbulance.php', { id_ambulans });
+      const response = await axios.post('https://91a7-125-164-23-22.ngrok-free.app/api/getAmbulance.php', { id_ambulans });
       console.log('Response:', response.data);
 
       if (response.data.success) {

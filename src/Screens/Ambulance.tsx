@@ -13,7 +13,7 @@ export default function Ambulance({ navigation }) {
 
   const fetchAmbulances = async () => {
     try {
-      const response = await axios.get('http://10.0.2.2/ambulance/get_all_ambulances.php');
+      const response = await axios.get('https://91a7-125-164-23-22.ngrok-free.app/api/get_all_ambulances.php');
 
       console.log('Response:', response.data);
 
@@ -56,21 +56,21 @@ export default function Ambulance({ navigation }) {
                     Tipe: {ambulance.tipe}
                   </Text>
                   <Text style={styles.dataInside}>
-                    Kondisi: {ambulance.status}
+                    Kondisi: {ambulance.status === "0" ? 'Tersedia' : 'Tidak Tersedia'}
                   </Text>
                 </View>
               </View>
               <View style={styles.conditionContainer}>
-                <TouchableOpacity style={[styles.conditionButton, { backgroundColor: ambulance.status === 'available' ? '#85DD00' : '#E64848' }]}>
+                <TouchableOpacity style={[styles.conditionButton, { backgroundColor: ambulance.status === '0' ? '#85DD00' : '#E64848' }]}>
                   <Text style={{ color: "white", fontSize: 16 }}>
-                    {ambulance.status === 'available' ? 'Tersedia' : 'Tidak Tersedia'}
+                    {ambulance.status === "0" ? 'Tersedia' : 'Tidak Tersedia'}
                   </Text>
                 </TouchableOpacity>
               </View>
             </View>
             <View style={[styles.data, { paddingTop: 55, paddingLeft: 15, flexDirection: "column" }]}>
-              <Image source={{ uri: `http://10.0.2.2/ambulance/${ambulance.gambar}` }} style={{ width: 140, height: 100, borderRadius: 15 }} />
-              <Text style={{ textAlign: "center", padding: 10 }}>4,2km</Text>
+              <Image source={{ uri: `https://91a7-125-164-23-22.ngrok-free.app/frontend/web/upload/${ambulance.gambar}` }} style={{ width: 140, height: 100, borderRadius: 15 }} />
+              {/* <Text style={{ textAlign: "center", padding: 10 }}>4,2km</Text> */}
             </View>
           </TouchableOpacity>
         ))}
@@ -104,7 +104,7 @@ const styles = StyleSheet.create({
   },
   dataText: {
     flex: 1,
-    paddingLeft: 20,
+    paddingLeft: 10,
   },
   dataTitle: {
     fontSize: 24,

@@ -16,7 +16,7 @@ export default function DetailAmbulance({ navigation, route }) {
 
   const fetchAmbulances = async () => {
     try {
-      const response = await axios.post('http://10.0.2.2/ambulance/get_ambu_rating.php', {
+      const response = await axios.post('https://91a7-125-164-23-22.ngrok-free.app/api/get_ambu_rating.php', {
         id_ambulans
       });
 
@@ -53,7 +53,7 @@ export default function DetailAmbulance({ navigation, route }) {
           
         />
         <View style={{width: "100%", }}>
-            <Image source={{ uri: `http://10.0.2.2/ambulance/${ambulance.gambar}` }}
+            <Image source={{ uri: `https://91a7-125-164-23-22.ngrok-free.app/frontend/web/upload/${ambulance.gambar}` }}
               style={{objectFit: "cover", width: '100%',
                 height: undefined,
                 aspectRatio: 5/3, }}></Image>
@@ -76,15 +76,6 @@ export default function DetailAmbulance({ navigation, route }) {
                     <Text style={styles.dataInside}>
                       Tipe 
                     </Text>
-                    <Text style={styles.dataInside}>
-                      Terakhir servis
-                    </Text>
-                    <Text style={styles.dataInside}>
-                      Kondisi
-                    </Text>
-                    <Text style={styles.dataInside}>
-                      Kondisi
-                    </Text>
                   </View>
                   <View style={{width: "60%"}}>
                     <Text style={styles.dataInside}>
@@ -93,24 +84,15 @@ export default function DetailAmbulance({ navigation, route }) {
                     <Text style={styles.dataInside}>
                       : {ambulance.tipe}
                     </Text>
-                    <Text style={styles.dataInside}>
-                      :
-                    </Text>
-                    <Text style={styles.dataInside}>
-                      :
-                    </Text>
-                    <Text style={styles.dataInside}>
-                      :
-                    </Text>
                   </View>
                 </View>
                 
               </View>
               <View style={styles.conditionContainer}>
                 <Text style={[styles.dataInside,{paddingBottom: 10}]}>Status</Text>
-                <TouchableOpacity style={[styles.conditionButton, { backgroundColor: ambulance.status === 'available' ? '#85DD00' : '#E64848' }]}>
+                <TouchableOpacity style={[styles.conditionButton, { backgroundColor: ambulance.status === '0' ? '#85DD00' : '#E64848' }]}>
                   <Text style={{ color: "white", fontSize: 16 }}>
-                    {ambulance.status === 'available' ? 'Tersedia' : 'Tidak Tersedia'}
+                    {ambulance.status === '0' ? 'Tersedia' : 'Tidak Tersedia'}
                   </Text>
                 </TouchableOpacity>
               </View>

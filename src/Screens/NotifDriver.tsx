@@ -17,7 +17,7 @@ export default function NotifDriver({ navigation, route }) {
     }
 
     try {
-      const response = await axios.post('http://10.0.2.2/ambulance/update_notif_driver.php', { id });
+      const response = await axios.post('https://91a7-125-164-23-22.ngrok-free.app/api/update_notif_driver.php', { id });
       console.log('Data yang dikirim:', { id });
       console.log('Response:', response.data);
 
@@ -43,7 +43,7 @@ export default function NotifDriver({ navigation, route }) {
     }
 
     try {
-      const response = await axios.post('http://10.0.2.2/ambulance/get_notif_driver.php', {
+      const response = await axios.post('https://91a7-125-164-23-22.ngrok-free.app/api/get_notif_driver.php', {
         id
       });
       console.log('Data yang dikirim:', { id,});
@@ -68,7 +68,7 @@ export default function NotifDriver({ navigation, route }) {
       <Header
         backgroundColor="#14A44D"
         leftComponent={
-          <TouchableOpacity onPress={() => navigation.navigate('HomeDriver', {notif: newNotif, unread: newUnread})}>
+          <TouchableOpacity onPress={() => navigation.navigate('HomeDriver', {notif: newNotif, unread: newUnread, id})}>
             <IconOutline name="arrow-left" color="white" size={25} />
           </TouchableOpacity>
         }

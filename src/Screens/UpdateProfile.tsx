@@ -24,7 +24,7 @@ export default function History({ navigation, route }) {
         NIK
       };
 
-      const response = await axios.post('http://10.0.2.2/ambulance/updateProfile.php', updatedData);
+      const response = await axios.post('https://91a7-125-164-23-22.ngrok-free.app/api/updateProfile.php', updatedData);
 
       if (response.data.success) {
         await AsyncStorage.setItem('userData', JSON.stringify(updatedData));

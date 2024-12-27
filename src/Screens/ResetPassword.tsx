@@ -13,7 +13,7 @@ export default function ForgotPassword({ navigation, route }) {
   const handleForgotPassword = async () => {
     if (newPassword2 === newPassword) {
         try {
-            const response = await axios.post('http://10.0.2.2/ambulance/reset_password.php', { 
+            const response = await axios.post('https://91a7-125-164-23-22.ngrok-free.app/api/reset_password.php', { 
               nik,
               newPassword
             });

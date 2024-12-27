@@ -16,7 +16,7 @@ export default function HistoryDriver({ navigation, route }) {
     }
 
     try {
-      const response = await axios.post('http://10.0.2.2/ambulance/get_history2.php', { id });
+      const response = await axios.post('https://91a7-125-164-23-22.ngrok-free.app/api/get_history2.php', { id });
       console.log('Data yang dikirim:', { id });
       console.log('Response:', response.data);
 
@@ -56,9 +56,9 @@ export default function HistoryDriver({ navigation, route }) {
             <View style={styles.dataContainer} key={index}>
               <View style={styles.data}>
                 <View style={styles.dataText}>
-                    <View style={{flexDirection: "row", justifyContent: "space-between", alignItems: "center", paddingBottom:15}}>
-                    <Text style={styles.dataTitle}>{riwayat.pemesan}</Text>
-                    <Rating
+                    <View style={{flexDirection: "column", paddingBottom:15}}>
+                      <View style={{flexDirection: "row", alignItems: 'center', justifyContent: 'flex-end'}}>
+                      <Rating
                                 type='star'
                                 ratingCount={5}
                                 fractions={1}
@@ -73,6 +73,10 @@ export default function HistoryDriver({ navigation, route }) {
                             <Text style={{padding: 5}}>
                                 ({riwayat.rating})
                             </Text>
+                      </View>
+                    
+                    <Text style={styles.dataTitle}>{riwayat.pemesan}</Text>
+                    
                     </View>
                   
                   <View style={{ paddingBottom: 10 }}>

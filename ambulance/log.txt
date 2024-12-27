@@ -1,0 +1,8 @@
+Data diterima: id_pemesan = 2
+Query: 
+SELECT orders.*, drivers.nama as sopir_name, users.name as nama_pemesan
+FROM orders
+JOIN drivers ON orders.id_sopir = drivers.id
+JOIN users ON orders.id_pemesan = users.id
+WHERE orders.id_pemesan = '2' AND (orders.status != 'selesai' AND orders.status != 'ditolak')
+

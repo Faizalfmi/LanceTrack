@@ -42,7 +42,7 @@ const HomeUser: React.FunctionComponent<OverlayComponentProps> = ({navigation, r
 
   useEffect(() => {
     // Set interval untuk refresh data setiap 10 detik
-    const interval = setInterval(fetchData, 10000); // 10000 ms = 10 detik
+    const interval = setInterval(fetchData, 5000); // 10000 ms = 10 detik
 
     // Bersihkan interval saat komponen unmount
     return () => clearInterval(interval);
@@ -80,7 +80,7 @@ const HomeUser: React.FunctionComponent<OverlayComponentProps> = ({navigation, r
     }
 
     try {
-      const response = await axios.post('http://10.0.2.2/ambulance/getOrder.php', {
+      const response = await axios.post('https://91a7-125-164-23-22.ngrok-free.app/api/getOrder.php', {
         id
       });
       console.log('Data yang dikirim:', { id,});
@@ -94,8 +94,8 @@ const HomeUser: React.FunctionComponent<OverlayComponentProps> = ({navigation, r
         setOrderDetails(null);
       }
     } catch (error) {
-      console.error('Error fetching order details:', error);
-      Alert.alert('Error', 'Terjadi kesalahan. Coba lagi nanti.');
+      console.log('Error fetching order details:', error);
+      
     }
   };
   useEffect(() => {
@@ -110,7 +110,7 @@ const HomeUser: React.FunctionComponent<OverlayComponentProps> = ({navigation, r
     }
 
     try {
-      const response = await axios.post('http://10.0.2.2/ambulance/get_notif.php', {
+      const response = await axios.post('https://91a7-125-164-23-22.ngrok-free.app/api/get_notif.php', {
         id
       });
       console.log('Data yang dikirim:', { id,});
@@ -125,7 +125,7 @@ const HomeUser: React.FunctionComponent<OverlayComponentProps> = ({navigation, r
         
       }
     } catch (error) {
-      console.error('Error fetching order details:', error);
+      console.log('Error fetching notif:', error);
     }
   };
   useEffect(() => {
@@ -141,7 +141,7 @@ const HomeUser: React.FunctionComponent<OverlayComponentProps> = ({navigation, r
     }
   
     try {
-      const response = await axios.post('http://10.0.2.2/ambulance/check_order_code.php', {
+      const response = await axios.post('https://91a7-125-164-23-22.ngrok-free.app/api/check_order_code.php', {
         orderCode
       });
   
@@ -150,9 +150,10 @@ const HomeUser: React.FunctionComponent<OverlayComponentProps> = ({navigation, r
       if (response.data.success) {
         setOrderDetails2(response.data.order);
         Alert.alert('Pesanan tersedia', 'Pesanan dengan kode pemesanan yang anda berikan tersedia');
-        
+        setVisible2(!visible2);
         // Navigate to the Track page
         navigation.navigate('Track', {
+          id,
           orderDetails: response.data.order, // Use response.data.order instead of orderDetails2
           id_ambulans: response.data.order.id_ambulans
         });
@@ -161,7 +162,7 @@ const HomeUser: React.FunctionComponent<OverlayComponentProps> = ({navigation, r
         Alert.alert('Pesanan tidak ditemukan', response.data.message);
       }
     } catch (error) {
-      console.error('Error fetching order details:', error);
+      console.log('Error fetching order details:', error);
       Alert.alert('Error', 'Terjadi kesalahan. Coba lagi nanti.');
     }
   };

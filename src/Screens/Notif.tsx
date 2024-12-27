@@ -17,7 +17,7 @@ export default function Notif({ navigation, route }) {
     }
 
     try {
-      const response = await axios.post('http://10.0.2.2/ambulance/update_notif.php', { id });
+      const response = await axios.post('https://91a7-125-164-23-22.ngrok-free.app/api/update_notif.php', { id });
       console.log('Data yang dikirim:', { id });
       console.log('Response:', response.data);
 
@@ -43,7 +43,7 @@ export default function Notif({ navigation, route }) {
     }
 
     try {
-      const response = await axios.post('http://10.0.2.2/ambulance/get_notif.php', {
+      const response = await axios.post('https://91a7-125-164-23-22.ngrok-free.app/api/get_notif.php', {
         id
       });
       console.log('Data yang dikirim:', { id,});

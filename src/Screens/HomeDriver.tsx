@@ -29,9 +29,10 @@ const HomeUser: React.FunctionComponent<OverlayComponentProps> = ({navigation, r
 
   const fetchData = () => {
     return new Promise((resolve, reject) => {
+      checkLoginStatus();
       fetchNotif();
       fetchOrderDetails();
-      checkLoginStatus();
+      
       resolve(); // Resolusi Promise setelah semua fungsi selesai dijalankan
     });
   };
@@ -76,13 +77,10 @@ const HomeUser: React.FunctionComponent<OverlayComponentProps> = ({navigation, r
   );
 
   const fetchOrderDetails = async () => {
-    if (!id) {
-      console.error('User ID is not set');
-      return;
-    }
+   
 
     try {
-      const response = await axios.post('http://10.0.2.2/ambulance/getOrder2.php', {
+      const response = await axios.post('https://91a7-125-164-23-22.ngrok-free.app/api/getOrder2.php', {
         id
       });
       console.log('Data yang dikirim:', { id });
@@ -113,7 +111,7 @@ const HomeUser: React.FunctionComponent<OverlayComponentProps> = ({navigation, r
     }
 
     try {
-      const response = await axios.post('http://10.0.2.2/ambulance/get_notif_driver.php', {
+      const response = await axios.post('https://91a7-125-164-23-22.ngrok-free.app/api/get_notif_driver.php', {
         id
       });
       console.log('Data yang dikirim:', { id,});
@@ -152,7 +150,10 @@ const HomeUser: React.FunctionComponent<OverlayComponentProps> = ({navigation, r
 
     useFocusEffect(
       useCallback(() => {
-        checkLoginStatus();
+        
+        if (route.params?.id) {
+          setId(route.params.id);
+        }
         if (route.params?.notif) {
           setNotif(route.params.notif);
         }
@@ -306,15 +307,16 @@ const styles = StyleSheet.create({
   orderShadow: {
     alignSelf: "center",
     width: "95%",
-    height: 200,
+    height: "auto",
     backgroundColor: "#d4d6d4",
     borderRadius: 20,
+    paddingBottom:5
   },
   order: {
     width: "99%",
     borderBottomEndRadius: 20,
     borderBottomStartRadius: 20,
-    height: 193,
+    height: "auto",
     backgroundColor: "white",
     alignSelf: "center",
     verticalAlign: "top"

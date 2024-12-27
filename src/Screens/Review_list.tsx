@@ -84,7 +84,7 @@ export default function Review_list({ navigation, route }) {
             </View>
           ))
         ) : (
-          <Text>Tidak ada riwayat yang ditemukan.</Text>
+          <Text>Tidak ada ulasan yang ditemukan.</Text>
         )}
       </View>
     </ScrollView>

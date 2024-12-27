@@ -42,7 +42,7 @@ const Order = ({ navigation, route }) => {
 
       // Memastikan data tidak null sebelum mengirimkan permintaan
       if (id && lat !== null && lng !== null) {
-        const response = await axios.post('http://10.0.2.2/ambulance/order.php', {
+        const response = await axios.post('https://91a7-125-164-23-22.ngrok-free.app/api/order.php', {
           id,
           lat,
           lng,
@@ -51,7 +51,7 @@ const Order = ({ navigation, route }) => {
 
         if (response.data.success) {
           Alert.alert('Pemesanan Berhasil', response.data.message);
-          navigation.navigate('Home');
+          navigation.navigate('HomeUser');
         } else {
           Alert.alert('Pemesanan Gagal', response.data.message);
         }
@@ -137,7 +137,7 @@ const Order = ({ navigation, route }) => {
             editable={false}
             />
 
-            <Text style={styles.inputText}>Lokasi Pasien</Text>
+            <Text style={styles.inputText}>Kondisi Pasien</Text>
             <TextInput
             style={styles.input}
             placeholder="Masukkan kondisi pasien..."
