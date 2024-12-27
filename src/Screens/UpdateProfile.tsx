@@ -24,7 +24,7 @@ export default function History({ navigation, route }) {
         NIK
       };
 
-      const response = await axios.post('https://91a7-125-164-23-22.ngrok-free.app/api/updateProfile.php', updatedData);
+      const response = await axios.post('http://10.0.2.2/ambulance/updateProfile.php', updatedData);
 
       if (response.data.success) {
         await AsyncStorage.setItem('userData', JSON.stringify(updatedData));
@@ -41,7 +41,7 @@ export default function History({ navigation, route }) {
   return (
       <ScrollView style={{backgroundColor: "white"}}>
         <Header
-          backgroundColor="#14A44D"
+          backgroundColor="#FF6F6F"
           leftComponent={
             <TouchableOpacity
             onPress={() => navigation.goBack()}>
@@ -171,7 +171,7 @@ const styles = StyleSheet.create({
     width: "90%",
     height: 48,
     borderRadius: 50,
-    backgroundColor: "#14A44D",
+    backgroundColor: "#FF6F6F",
     alignSelf: "center",
     justifyContent: "center",
     

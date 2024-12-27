@@ -8,16 +8,14 @@ const RegisterScreen = ({navigation}) => {
   const [email, setEmail] = useState('');
   const [phone, setPhone] = useState('');
   const [password, setPassword] = useState('');
-  const [nik, setNik] = useState('');
 
   const handleRegister = async () => {
     try {
-      const response = await axios.post('https://91a7-125-164-23-22.ngrok-free.app/api/register.php', {
+      const response = await axios.post('http://10.0.2.2/ambulance/register.php', {
         name,
         email,
         phone,
-        password,
-        nik
+        password
       });
       
       if (response.data.success) {
@@ -25,7 +23,6 @@ const RegisterScreen = ({navigation}) => {
         navigation.navigate('LoginUser');
       } else {
         Alert.alert('Registrasi Gagal', response.data.message);
-        console.log('Registrasi Gagal', response.data.message);
       }
     } catch (error) {
       console.error(error);
@@ -37,7 +34,7 @@ const RegisterScreen = ({navigation}) => {
     <View style={styles.container}>
       <Text style={styles.header}>Register</Text>
 
-      <Text style={styles.inputText}>Nama Lengkap (Sesuai KTP)</Text>
+      <Text style={styles.inputText}>Nama Lengkap</Text>
       <TextInput
         style={styles.input}
         onChangeText={text => setName(text)}
@@ -56,14 +53,6 @@ const RegisterScreen = ({navigation}) => {
         keyboardType="phone-pad"
       />
 
-      <Text style={styles.inputText}>NIK</Text>
-      <TextInput
-        style={styles.input}
-        onChangeText={text => setNik(text)}
-        maxLength={16}
-        
-      />
-
       <Text style={styles.inputText}>Password</Text>
       <TextInput
         style={styles.input}
@@ -80,7 +69,7 @@ const RegisterScreen = ({navigation}) => {
       </View>
       
       <View style={{flexDirection: "row"}}>
-        <Text style={{color: "black", fontSize: 16}}>Sudah punya akun? </Text><TouchableOpacity onPress={() => navigation.navigate('LoginUser')}><Text style={{color: "#14A44D", fontSize: 14, fontWeight: "bold"}}>Login</Text></TouchableOpacity>
+        <Text style={{color: "black", fontSize: 16}}>Sudah punya akun? </Text><TouchableOpacity onPress={() => navigation.navigate('LoginUser')}><Text style={{color: "#FF6F6F", fontSize: 14, fontWeight: "bold"}}>Login</Text></TouchableOpacity>
       </View>
       
       
@@ -100,7 +89,7 @@ const styles = StyleSheet.create({
     fontSize: 40,
     marginBottom: 20,
     padding: 20,
-    color: '#14A44D',
+    color: '#C21010',
     width: "95%"
     
   },
@@ -131,7 +120,7 @@ const styles = StyleSheet.create({
     height: 50, 
     justifyContent: 'center',
     alignItems: 'center',
-    backgroundColor: '#14A44D', 
+    backgroundColor: '#FF6F6F', 
     borderRadius: 25,
     
   },
